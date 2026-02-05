@@ -5,6 +5,7 @@ import { useCartStore } from '../store/cartStore';
 import { useToastStore } from '../store/toastStore';
 import { Skeleton } from './ui/Skeleton';
 import { capitalizeCategory, formatPrice, hasDiscount } from '../utils/formatters';
+import { getColorValue, isLightColor } from '../utils/colors';
 
 interface ProductCardProps {
     product?: Product;
@@ -86,6 +87,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoading = f
                     <h2 className="text-[13px] md:text-lg font-semibold md:font-bold text-dark leading-tight group-hover:text-accent transition-colors duration-300 line-clamp-2">
                         {product.name}
                     </h2>
+                    {product.colors && product.colors.length > 0 ? (
+                        <div className="flex items-center gap-1.5 pt-0.5">
+                            {product.colors
+                                .filter(c => !product.hidden_colors?.includes(c))
+                                .map(c => {
+                                    const colorValue = getColorValue(c);
+                                    return (
+                                        <div
+                                            key={c}
+                                            className="w-2.5 h-2.5 rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
+                                            style={{
+                                                backgroundColor: colorValue,
+                                                border: isLightColor(colorValue) ? '1px solid #E5E7EB' : '1px solid rgba(0,0,0,0.1)'
+                                            }}
+                                            title={c}
+                                        />
+                                    );
+                                })}
+                        </div>
+                    ) : product.color ? (
+                        <p className="text-[10px] md:text-sm text-gray font-medium leading-tight">
+                            {product.color}
+                        </p>
+                    ) : null}
 
                     {/* Sizes Pills */}
                     {product.sizes && product.sizes.length > 0 && (

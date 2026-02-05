@@ -13,6 +13,9 @@ export interface Product {
     is_visible?: boolean; // Whether product is visible to customers (default: true)
     barcode?: string; // Barcode for inventory management
     images?: string[]; // Multiple images support
+    color?: string; // Legacy/Primary color
+    colors?: string[]; // Multiple colors support
+    hidden_colors?: string[]; // Colors hidden from customers
 }
 
 export interface Purchase {
@@ -24,9 +27,11 @@ export interface Purchase {
     source_app: number; // 1 or 2
     category: string;
     photo_url?: string;
+    color?: string;
     status: 'pending' | 'arrived' | 'listed' | 'archived';
     delivery_cost?: number;
     total_cost?: number; // purchase_price + delivery_cost
+    yuan_price?: number; // Price in Yuan
     order_date?: string; // When the order was placed
     arrival_date?: string; // When the order arrived
     item_url?: string; // Link to the product source
@@ -38,6 +43,7 @@ export interface Sale {
     product_id: string | null;
     product_name: string;
     size: string;
+    color?: string;
     quantity: number;
     purchase_price?: number; // Optional: For backward compatibility with existing sales
     selling_price: number;
@@ -49,6 +55,7 @@ export interface Sale {
 export interface CartItem extends Product {
     quantity: number;
     selectedSize?: string;
+    selectedColor?: string;
 }
 
 export interface FocalPlan {

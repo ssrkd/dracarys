@@ -150,6 +150,19 @@ export const productService = {
         return this.updateProduct(id, { is_visible: newVisibility });
     },
 
+    // Toggle specific color visibility
+    async toggleColorVisibility(productId: string, color: string): Promise<Product> {
+        const product = await this.getProductById(productId);
+        if (!product) throw new Error('Product not found');
+
+        const currentHidden = product.hidden_colors || [];
+        const updatedHidden = currentHidden.includes(color)
+            ? currentHidden.filter(c => c !== color)
+            : [...currentHidden, color];
+
+        return this.updateProduct(productId, { hidden_colors: updatedHidden });
+    },
+
     // Get only visible products (for customer view)
     async getVisibleProducts(): Promise<Product[]> {
         if (!supabase) return [];

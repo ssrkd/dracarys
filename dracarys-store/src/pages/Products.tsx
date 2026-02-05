@@ -78,8 +78,8 @@ export const Products: React.FC = () => {
             );
         }
 
-        // Hide products that are fully out of stock (total availability by name == 0)
-        const visibleByStock = filtered.filter(p => inventoryService.totalForName(availability, p.name) > 0);
+        // Hide products that are fully out of stock (total availability by name == 0) or all variants are hidden
+        const visibleByStock = filtered.filter(p => inventoryService.totalVisibleForProduct(availability, p.name, p.hidden_colors) > 0);
         setFilteredProducts(visibleByStock);
     }, [products, selectedCategory, priceRange, searchQuery, availability]);
 

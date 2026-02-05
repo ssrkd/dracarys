@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingCart, TrendingUp, Plus, Trash2, LayoutDashboard, Brain, Check, Package, X, Download, Loader2, Search, Printer, Pencil, Calendar, Clock, Send, Copy, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ShoppingCart, TrendingUp, Plus, Trash2, LayoutDashboard, Brain, Check, Package, X, Download, Loader2, Search, Printer, Pencil, Calendar, Clock, Send, Copy, FileText, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -8,6 +8,7 @@ import { productService } from '../services/productService';
 import { purchaseService } from '../services/purchaseService';
 import type { Sale, Product, Purchase } from '../types/database';
 import { formatPrice } from '../utils/formatters';
+import { getColorValue, isLightColor } from '../utils/colors';
 import { useToastStore } from '../store/toastStore';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
@@ -174,9 +175,10 @@ export const AdminAI: React.FC = () => {
         category: '',
         price: '',
         barcode: '',
+        colors: [] as string[],
         images: [] as string[],
         sizes: [] as string[],
-        stockQuantities: {} as Record<string, string>
+        stockQuantities: {} as Record<string, Record<string, string>> // color -> size -> qty
     });
 
     // Order arrival modal state
@@ -198,15 +200,20 @@ export const AdminAI: React.FC = () => {
         category: '',
         price: '',
         description: '',
+        colors: [] as string[],
         photo_url: '',
         images: [] as string[],
         sizes: [] as string[],
         initial_size: '',
         initial_quantity: '',
-        stock_quantities: {} as Record<string, string>
+        selected_color: '', // For stock addition
+        stock_quantities: {} as Record<string, Record<string, string>> // color -> size -> qty
     });
 
-    const [stockAdditions, setStockAdditions] = useState<Record<string, string>>({});
+    const [stockAdditions, setStockAdditions] = useState<Record<string, Record<string, string>>>({}); // color -> size -> qty
+    const [selectedBarcodeColor, setSelectedBarcodeColor] = useState('');
+    const [newColorInput, setNewColorInput] = useState('');
+    const [newEditColorInput, setNewEditColorInput] = useState('');
 
     // Sale Form state - With barcode support
     const [newSale, setNewSale] = useState({
@@ -214,6 +221,7 @@ export const AdminAI: React.FC = () => {
         product_id: '',
         product_name: '',
         size: '',
+        color: '',
         quantity: '' as string | number,
         selling_price: '',
         sale_date: new Date().toISOString().split('T')[0]
@@ -222,19 +230,19 @@ export const AdminAI: React.FC = () => {
     const [barcodeLoading, setBarcodeLoading] = useState(false);
     // const [stockAddition, setStockAddition] = useState({ size: '', quantity: '' }); // Deprecated in favor of stockAdditions
 
-    // Purchase Form state
     const [newPurchase, setNewPurchase] = useState({
         name: '',
-        size: '',
-        quantity: '' as string | number,
         purchase_price: '',
+        yuan_price: '',
         source_app: 1,
         category: '',
         photo_url: '',
+        color: '',
         order_date: new Date().toISOString().split('T')[0],
         isExistingProduct: false,
         existingProductId: '',
-        item_url: ''
+        item_url: '',
+        stock_quantities: {} as Record<string, Record<string, string>> // color -> size -> qty
     });
 
     // Auto-calculate selling price per unit when product is set
@@ -366,6 +374,7 @@ export const AdminAI: React.FC = () => {
                 product_id: newSale.product_id,
                 product_name: selectedProduct.name,
                 size: newSale.size,
+                color: newSale.color,
                 quantity: Number(newSale.quantity) || 1,
                 purchase_price: selectedProduct.cost || 0,
                 selling_price: parseInt(newSale.selling_price) || 0,
@@ -378,6 +387,7 @@ export const AdminAI: React.FC = () => {
                 product_id: '',
                 product_name: '',
                 size: '',
+                color: '',
                 quantity: '',
                 selling_price: '',
                 sale_date: new Date().toISOString().split('T')[0]
@@ -392,47 +402,72 @@ export const AdminAI: React.FC = () => {
     const handleAddPurchase = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!newPurchase.name || !newPurchase.size || !newPurchase.quantity || !newPurchase.purchase_price) {
-            addToast('error', 'Заполните все поля закупки');
+        // Flatten stock_quantities from { color: { size: qty } } to list of entries
+        const allEntries: { color: string, size: string, qty: string }[] = [];
+        Object.entries(newPurchase.stock_quantities).forEach(([color, sizes]) => {
+            if (typeof sizes === 'object' && sizes !== null) {
+                Object.entries(sizes).forEach(([size, qty]) => {
+                    if (qty && parseInt(qty as string) > 0) {
+                        allEntries.push({ color, size, qty: qty as string });
+                    }
+                });
+            }
+        });
+
+        if (!newPurchase.name || allEntries.length === 0 || !newPurchase.purchase_price) {
+            addToast('error', 'Заполните название, цену и хотя бы один размер');
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const price = parseInt(newPurchase.purchase_price);
+            const yuanPrice = newPurchase.yuan_price ? parseInt(newPurchase.yuan_price) : undefined;
+
             if (isNaN(price)) {
                 addToast('error', 'Введите корректную цену');
+                setIsSubmitting(false);
                 return;
             }
 
-            // Create as 'pending' (В пути)
-            await purchaseService.createPurchase({
-                name: newPurchase.name,
-                size: newPurchase.size,
-                quantity: Number(newPurchase.quantity),
-                purchase_price: price,
-                source_app: newPurchase.source_app,
-                category: newPurchase.category,
-                photo_url: newPurchase.photo_url || undefined,
-                order_date: newPurchase.order_date,
-                item_url: newPurchase.item_url || undefined
-            });
-            addToast('success', 'Закупка добавлена');
+            // Create separate pending records for each size/color combination
+            await Promise.all(allEntries.map(entry =>
+                purchaseService.createPurchase({
+                    name: newPurchase.name,
+                    size: entry.size,
+                    color: entry.color,
+                    quantity: parseInt(entry.qty),
+                    purchase_price: price,
+                    yuan_price: yuanPrice,
+                    source_app: newPurchase.source_app,
+                    category: newPurchase.category,
+                    photo_url: newPurchase.photo_url || undefined,
+                    order_date: newPurchase.order_date,
+                    item_url: newPurchase.item_url || undefined
+                })
+            ));
+
+            addToast('success', `Добавлено позиций: ${allEntries.length}`);
             setNewPurchase({
                 name: '',
-                size: '',
-                quantity: '',
                 purchase_price: '',
+                yuan_price: '',
                 source_app: 1,
                 category: '',
                 photo_url: '',
+                color: '',
                 order_date: new Date().toISOString().split('T')[0],
                 isExistingProduct: false,
                 existingProductId: '',
-                item_url: ''
+                item_url: '',
+                stock_quantities: {}
             });
             loadData();
         } catch (error) {
+            console.error('Error adding bulk purchase:', error);
             addToast('error', 'Ошибка при добавлении закупки');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -551,11 +586,13 @@ export const AdminAI: React.FC = () => {
             category: '',
             price: '',
             description: '',
+            colors: [],
             photo_url: '',
             images: [],
             sizes: [],
             initial_size: '',
             initial_quantity: '',
+            selected_color: '',
             stock_quantities: {}
         });
         setStockAdditions({});
@@ -572,14 +609,17 @@ export const AdminAI: React.FC = () => {
             category: '',
             price: '',
             description: '',
+            colors: [],
             photo_url: '',
             images: [],
             sizes: [],
             initial_size: '',
             initial_quantity: '',
+            selected_color: '',
             stock_quantities: {}
         });
         setStockAdditions({});
+        setSelectedBarcodeColor('');
     };
 
     const handleBarcodeModalSearch = async (barcode: string) => {
@@ -597,6 +637,7 @@ export const AdminAI: React.FC = () => {
                 // If we found a product with this barcode, show it
                 setBarcodeModalProduct(product);
                 setBarcodeModalStep('found');
+                setSelectedBarcodeColor(product.colors?.[0] || 'Без цвета');
             } else {
                 // If we didn't find a product, and we're NOT in assign mode, go to notfound
                 // If we ARE in assign mode, stay there (it means the barcode is free to use)
@@ -634,11 +675,18 @@ export const AdminAI: React.FC = () => {
                 uploadedUrls.push(url);
             }
 
-            setNewProductForm(prev => ({
-                ...prev,
-                images: [...prev.images, ...uploadedUrls],
-                photo_url: prev.photo_url || uploadedUrls[0]
-            }));
+            if (isEditModalOpen) {
+                setEditForm(prev => ({
+                    ...prev,
+                    images: [...(prev.images || []), ...uploadedUrls]
+                }));
+            } else {
+                setNewProductForm(prev => ({
+                    ...prev,
+                    images: [...(prev.images || []), ...uploadedUrls],
+                    photo_url: prev.photo_url || uploadedUrls[0]
+                }));
+            }
             addToast('success', `${files.length} фото загружено`);
         } catch (error) {
             console.error('Image upload error:', error);
@@ -651,22 +699,39 @@ export const AdminAI: React.FC = () => {
     const handleAddStock = async () => {
         if (!barcodeModalProduct) return;
 
-        const entries = Object.entries(stockAdditions).filter(([_, qty]) => qty && parseInt(qty) > 0);
-        if (entries.length === 0) return;
+        const flatEntries: { color: string, size: string, qty: number }[] = [];
+        Object.entries(stockAdditions).forEach(([color, sizes]) => {
+            Object.entries(sizes).forEach(([size, qty]) => {
+                if (qty && parseInt(qty) > 0) {
+                    flatEntries.push({ color, size, qty: parseInt(qty) });
+                }
+            });
+        });
+
+        if (flatEntries.length === 0) return;
 
         setIsSubmitting(true);
         try {
-            // Ensure product.sizes contains added sizes and set visible
-            const addedSizes = entries.map(([size]) => size);
+            // Ensure product.sizes and colors contains added sizes/colors and set visible
+            const addedSizes = Array.from(new Set(flatEntries.map(e => e.size)));
+            const addedColors = Array.from(new Set(flatEntries.map(e => e.color)));
             const currentProduct = barcodeModalProduct;
-            const mergedSizes = Array.from(new Set([...(currentProduct.sizes || []), ...addedSizes]));
-            await productService.updateProduct(currentProduct.id, { sizes: mergedSizes, is_visible: true });
 
-            await Promise.all(entries.map(([size, qty]) =>
+            const mergedSizes = Array.from(new Set([...(currentProduct.sizes || []), ...addedSizes]));
+            const mergedColors = Array.from(new Set([...(currentProduct.colors || []), ...addedColors]));
+
+            await productService.updateProduct(currentProduct.id, {
+                sizes: mergedSizes,
+                colors: mergedColors,
+                is_visible: true
+            });
+
+            await Promise.all(flatEntries.map(e =>
                 purchaseService.createListedPurchase({
                     name: barcodeModalProduct.name,
-                    size: size,
-                    quantity: parseInt(qty),
+                    size: e.size,
+                    color: e.color,
+                    quantity: e.qty,
                     purchase_price: barcodeModalProduct.cost || 0,
                     source_app: 1,
                     category: barcodeModalProduct.category,
@@ -925,18 +990,33 @@ export const AdminAI: React.FC = () => {
             });
 
             // 2. Add stock if specified
-            // 2. Add stock if specified
-            const entries = Object.entries(stockAdditions).filter(([_, qty]) => qty && parseInt(qty) > 0);
-            if (entries.length > 0) {
-                // Merge sizes on the product
-                const addedSizes = entries.map(([size]) => size);
+            const flatEntries: { color: string, size: string, qty: number }[] = [];
+            Object.entries(stockAdditions).forEach(([color, sizes]) => {
+                Object.entries(sizes).forEach(([size, qty]) => {
+                    if (qty && parseInt(qty) > 0) {
+                        flatEntries.push({ color, size, qty: parseInt(qty) });
+                    }
+                });
+            });
+
+            if (flatEntries.length > 0) {
+                // Merge sizes and colors on the product
+                const addedSizes = Array.from(new Set(flatEntries.map(e => e.size)));
+                const addedColors = Array.from(new Set(flatEntries.map(e => e.color)));
                 const mergedSizes = Array.from(new Set([...(barcodeModalAssignProduct.sizes || []), ...addedSizes]));
-                await productService.updateProduct(barcodeModalAssignProduct.id, { sizes: mergedSizes });
-                await Promise.all(entries.map(([size, qty]) =>
+                const mergedColors = Array.from(new Set([...(barcodeModalAssignProduct.colors || []), ...addedColors]));
+
+                await productService.updateProduct(barcodeModalAssignProduct.id, {
+                    sizes: mergedSizes,
+                    colors: mergedColors
+                });
+
+                await Promise.all(flatEntries.map(e =>
                     purchaseService.createListedPurchase({
                         name: barcodeModalAssignProduct.name,
-                        size: size,
-                        quantity: parseInt(qty),
+                        size: e.size,
+                        color: e.color,
+                        quantity: e.qty,
                         purchase_price: barcodeModalAssignProduct.cost || 0,
                         source_app: 1,
                         category: barcodeModalAssignProduct.category,
@@ -966,22 +1046,25 @@ export const AdminAI: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            // Determine sizes from stock quantities + any explicitly selected sizes (if we kept that logic, but we are replacing it)
-            // For now, let's say sizes are any size with > 0 quantity.
-            const sizesFromStock = Object.entries(newProductForm.stock_quantities)
-                .filter(([_, qty]) => qty && parseInt(qty) > 0)
-                .map(([size]) => size);
+            // Flatten stock entries
+            const flatStock: { color: string, size: string, qty: number }[] = [];
+            Object.entries(newProductForm.stock_quantities).forEach(([color, sizes]) => {
+                Object.entries(sizes).forEach(([size, qty]) => {
+                    if (qty && parseInt(qty as any) > 0) {
+                        flatStock.push({ color, size, qty: parseInt(qty as any) });
+                    }
+                });
+            });
 
-            // If no stock added to any size, maybe user just wants to create product? 
-            // The prompt implies we want to add checks. We'll include sizes that have valid input.
-            // Also merging with existing newProductForm.sizes just in case logic acts weird, but primarly relying on stock inputs.
-            const finalSizes = Array.from(new Set([...newProductForm.sizes, ...sizesFromStock]));
+            const finalSizes = Array.from(new Set([...newProductForm.sizes, ...flatStock.map(e => e.size)]));
+            const finalColors = Array.from(new Set([...newProductForm.colors, ...flatStock.map(e => e.color)]));
 
             const product = await productService.createProduct({
                 name: newProductForm.name,
                 category: newProductForm.category,
                 price: parseInt(newProductForm.price),
                 description: newProductForm.description,
+                colors: finalColors,
                 image_url: newProductForm.images.join(','),
                 images: newProductForm.images,
                 sizes: finalSizes,
@@ -991,13 +1074,13 @@ export const AdminAI: React.FC = () => {
             });
 
             // Add initial stock if provided
-            const entries = Object.entries(newProductForm.stock_quantities).filter(([_, qty]) => qty && parseInt(qty) > 0);
-            if (entries.length > 0) {
-                await Promise.all(entries.map(([size, qty]) =>
+            if (flatStock.length > 0) {
+                await Promise.all(flatStock.map(e =>
                     purchaseService.createListedPurchase({
                         name: product.name,
-                        size: size,
-                        quantity: parseInt(qty),
+                        size: e.size,
+                        color: e.color,
+                        quantity: e.qty,
                         purchase_price: 0,
                         source_app: 1,
                         category: product.category,
@@ -1019,19 +1102,33 @@ export const AdminAI: React.FC = () => {
     };
 
 
+    const handleToggleColorVisibility = async (productId: string, color: string) => {
+        try {
+            await productService.toggleColorVisibility(productId, color);
+            addToast('success', 'Видимость цвета обновлена');
+        } catch (error) {
+            console.error('Error toggling color visibility:', error);
+            addToast('error', 'Не удалось обновить видимость цвета');
+        }
+    };
+
     const handleEditProduct = (product: Product) => {
         setEditingProduct(product);
         const nameKey = product.name.trim();
-        const productInventory = inventory[nameKey];
 
-        // Combine sizes from the product DB and actual stock in inventory
-        const stockSizes = productInventory?.sizes
-            ? Object.entries(productInventory.sizes)
-                .filter(([_, q]) => q > 0)
-                .map(([s]) => s)
-            : [];
+        // Find all inventory entries for this product (all colors)
+        const productEntries = Object.entries(inventory)
+            .filter(([key]) => key.startsWith(`${nameKey}:::`))
+            .map(([_, data]) => data);
 
-        const initialSizes = Array.from(new Set([...(product.sizes || []), ...stockSizes]));
+        // Map to editForm.stockQuantities: Record<string, Record<string, string>>
+        const stockQuantities: Record<string, Record<string, string>> = {};
+        productEntries.forEach(entry => {
+            stockQuantities[entry.color] = {};
+            Object.entries(entry.sizes).forEach(([size, qty]) => {
+                stockQuantities[entry.color][size] = qty.toString();
+            });
+        });
 
         setEditForm({
             name: product.name,
@@ -1039,11 +1136,12 @@ export const AdminAI: React.FC = () => {
             category: product.category,
             price: product.price.toString(),
             barcode: product.barcode || '',
+            colors: product.colors || (product.color ? [product.color] : []),
             images: product.images || (product.image_url ? product.image_url.split(',') : []),
-            sizes: initialSizes,
-            stockQuantities: productInventory?.sizes ?
-                Object.fromEntries(Object.entries(productInventory.sizes).map(([s, q]) => [s, (q === 0) ? '' : q.toString()])) : {}
+            sizes: product.sizes || [],
+            stockQuantities
         });
+        setSelectedBarcodeColor(product.colors?.[0] || 'Без цвета');
         setIsEditModalOpen(true);
     };
 
@@ -1060,38 +1158,87 @@ export const AdminAI: React.FC = () => {
                 category: editForm.category,
                 price: parseInt(editForm.price),
                 barcode: editForm.barcode,
+                colors: editForm.colors,
                 images: editForm.images,
                 sizes: editForm.sizes
             });
 
-            // 2. Handle stock quantity adjustments
-            const nameKey = editingProduct.name.trim();
-            const currentStock = inventory[nameKey]?.sizes || {};
+            // 2. Handle stock quantity adjustments (per color and size)
+            const oldNameKey = editingProduct.name.trim();
+            const newNameKey = editForm.name.trim();
+            const nameChanged = oldNameKey !== newNameKey;
+
             const adjustmentPromises = [];
 
-            // Get all unique sizes from both current stock and the edit form
-            const allPossibleSizes = Array.from(new Set([
-                ...Object.keys(currentStock),
-                ...editForm.sizes
-            ]));
+            // Iterate over all actual inventory colors for this product
+            const productEntries = Object.entries(inventory)
+                .filter(([k]) => k.startsWith(`${oldNameKey}:::`));
 
-            for (const size of allPossibleSizes) {
-                const isSelected = editForm.sizes.includes(size);
-                // If not selected, we assume target is 0. If selected, use the form value.
-                const targetQty = isSelected ? parseInt(editForm.stockQuantities[size] || '0') : 0;
-                const currentQty = currentStock[size] || 0;
-                const diff = targetQty - currentQty;
+            // Map of current stock: color -> size -> qty
+            const currentStockMap: Record<string, Record<string, number>> = {};
+            productEntries.forEach(([_, data]) => {
+                currentStockMap[data.color] = data.sizes;
+            });
 
-                if (diff !== 0) {
-                    adjustmentPromises.push(purchaseService.createListedPurchase({
-                        name: editingProduct.name, // Keep original name for consistency but we should probably trim it in the service too
-                        size: size,
-                        quantity: diff,
-                        purchase_price: editingProduct.cost || 0,
-                        source_app: 1,
-                        category: editingProduct.category,
-                        order_date: new Date().toISOString().split('T')[0]
-                    }));
+            // All colors to consider: current colors + form colors
+            const allColors = Array.from(new Set([...Object.keys(currentStockMap), ...editForm.colors]));
+
+            for (const color of allColors) {
+                const isColorActive = editForm.colors.includes(color);
+                const currentSizes = currentStockMap[color] || {};
+                const formSizes = editForm.stockQuantities[color] || {};
+
+                // All sizes to consider for this color
+                const allSizes = Array.from(new Set([...Object.keys(currentSizes), ...editForm.sizes]));
+
+                for (const size of allSizes) {
+                    const isSizeActive = editForm.sizes.includes(size) && isColorActive;
+                    const targetQty = isSizeActive ? parseInt(formSizes[size] || '0') : 0;
+                    const currentQty = currentSizes[size] || 0;
+
+                    if (nameChanged) {
+                        // 1. Zero out old name
+                        if (currentQty !== 0) {
+                            adjustmentPromises.push(purchaseService.createListedPurchase({
+                                name: oldNameKey,
+                                size,
+                                color,
+                                quantity: -currentQty,
+                                purchase_price: editingProduct.cost || 0,
+                                source_app: 1,
+                                category: editingProduct.category,
+                                order_date: new Date().toISOString().split('T')[0]
+                            }));
+                        }
+                        // 2. Set new name with target quantity
+                        if (targetQty !== 0) {
+                            adjustmentPromises.push(purchaseService.createListedPurchase({
+                                name: newNameKey,
+                                size,
+                                color,
+                                quantity: targetQty,
+                                purchase_price: editingProduct.cost || 0,
+                                source_app: 1,
+                                category: editForm.category,
+                                order_date: new Date().toISOString().split('T')[0]
+                            }));
+                        }
+                    } else {
+                        // Normal adjustment for same name
+                        const diff = targetQty - currentQty;
+                        if (diff !== 0) {
+                            adjustmentPromises.push(purchaseService.createListedPurchase({
+                                name: newNameKey,
+                                size,
+                                color,
+                                quantity: diff,
+                                purchase_price: editingProduct.cost || 0,
+                                source_app: 1,
+                                category: editForm.category,
+                                order_date: new Date().toISOString().split('T')[0]
+                            }));
+                        }
+                    }
                 }
             }
 
@@ -1114,86 +1261,73 @@ export const AdminAI: React.FC = () => {
 
     const calculateInventory = () => {
         const inventory: Record<string, {
+            name: string;
+            color: string;
             category: string;
             sizes: Record<string, number>;
             totalQty: number;
             unlistedPurchases: Purchase[];
         }> = {};
 
-        // 1. Initialize inventory structure from products without inflating quantities
-        products.forEach(p => {
-            const name = p.name.trim();
-            if (!inventory[name]) {
-                inventory[name] = {
-                    category: p.category,
+        // Helper to get or create inventory entry
+        const getEntry = (name: string, color: string = 'Без цвета', category: string = 'Прочее') => {
+            const n = name.trim();
+            const c = color.trim() || 'Без цвета';
+            const key = `${n}:::${c}`;
+            if (!inventory[key]) {
+                inventory[key] = {
+                    name: n,
+                    color: c,
+                    category,
                     sizes: {},
                     totalQty: 0,
                     unlistedPurchases: []
                 };
             }
-            // Use product.sizes only to initialize size keys if needed, but do not add quantity
-            if (p.sizes) {
-                p.sizes.forEach(size => {
-                    const s = size.trim();
-                    if (inventory[name].sizes[s] === undefined) {
-                        inventory[name].sizes[s] = 0;
-                    }
-                });
-            }
+            return inventory[key];
+        };
+
+        // 1. Initialize from products
+        products.forEach(p => {
+            const colors = p.colors && p.colors.length > 0 ? p.colors : [p.color || 'Без цвета'];
+            colors.forEach(color => {
+                const entry = getEntry(p.name, color, p.category);
+                if (p.sizes) {
+                    p.sizes.forEach(size => {
+                        const s = size.trim();
+                        if (entry.sizes[s] === undefined) entry.sizes[s] = 0;
+                    });
+                }
+            });
         });
 
         // 2. Subtract sold items
         sales.forEach(s => {
-            const name = s.product_name.trim();
+            const entry = getEntry(s.product_name, s.color || 'Без цвета');
             const size = s.size.trim();
-            if (inventory[name]) {
-                if (inventory[name].sizes[size] !== undefined) {
-                    inventory[name].sizes[size] -= s.quantity;
-                    inventory[name].totalQty -= s.quantity;
-                } else {
-                    // Even if size not in product.sizes, if it's sold, track it
-                    inventory[name].sizes[size] = -(s.quantity);
-                    inventory[name].totalQty -= s.quantity;
-                }
+            if (entry.sizes[size] !== undefined) {
+                entry.sizes[size] -= s.quantity;
+            } else {
+                entry.sizes[size] = -(s.quantity);
             }
+            entry.totalQty -= s.quantity;
         });
 
         // 3. Process purchases
-        const productNames = new Set(products.map(pr => pr.name.trim()));
         purchases.filter(p => p.status !== 'archived').forEach(p => {
             const name = p.name.trim();
+            const color = p.color || 'Без цвета';
             const size = p.size.trim();
 
-            // Only 'listed' purchases count towards Warehouse stock
             if (p.status === 'listed') {
-                if (productNames.has(name)) {
-                    if (!inventory[name]) {
-                        inventory[name] = {
-                            category: p.category,
-                            sizes: {},
-                            totalQty: 0,
-                            unlistedPurchases: []
-                        };
-                    }
-                    inventory[name].sizes[size] = (inventory[name].sizes[size] || 0) + p.quantity;
-                    inventory[name].totalQty += p.quantity;
-                }
-            }
-
-            // Add to unlistedPurchases for Archive/Workflow view
-            if (p.status === 'arrived' || p.status === 'pending') {
-                if (!inventory[name]) {
-                    inventory[name] = {
-                        category: p.category,
-                        sizes: {},
-                        totalQty: 0,
-                        unlistedPurchases: []
-                    };
-                }
-                inventory[name].unlistedPurchases.push(p);
+                const entry = getEntry(name, color, p.category);
+                entry.sizes[size] = (entry.sizes[size] || 0) + p.quantity;
+                entry.totalQty += p.quantity;
+            } else if (p.status === 'arrived' || p.status === 'pending') {
+                const entry = getEntry(name, color, p.category);
+                entry.unlistedPurchases.push(p);
             }
         });
-
         return inventory;
     };
 
@@ -1220,6 +1354,50 @@ export const AdminAI: React.FC = () => {
 
     const stats = calculateStats();
     const inventory = calculateInventory();
+
+    // CRITICAL: Filter inventory for Warehouse view
+    // 1. Must exist in Products list
+    // 2. Must have totalQty > 0 (to hide pending purchases/out of stock)
+    const warehouseInventory = Object.fromEntries(
+        Object.entries(inventory).filter(([_, data]) => {
+            const product = products.find(p => p.name.trim() === data.name.trim());
+            return product && product.is_visible !== false;
+        })
+    );
+
+    const groupedWarehouseInventory = useMemo(() => {
+        const grouped: Record<string, {
+            name: string;
+            category: string;
+            variants: Record<string, {
+                color: string;
+                sizes: Record<string, number>;
+                totalQty: number;
+                unlistedPurchases: Purchase[];
+            }>;
+            totalQty: number;
+        }> = {};
+
+        Object.entries(warehouseInventory).forEach(([_, data]) => {
+            const name = data.name;
+            if (!grouped[name]) {
+                grouped[name] = {
+                    name,
+                    category: data.category,
+                    variants: {},
+                    totalQty: 0
+                };
+            }
+            grouped[name].variants[data.color] = {
+                color: data.color,
+                sizes: data.sizes,
+                totalQty: data.totalQty,
+                unlistedPurchases: data.unlistedPurchases
+            };
+            grouped[name].totalQty += data.totalQty;
+        });
+        return grouped;
+    }, [warehouseInventory]);
 
     const askAi = async () => {
         setIsAiLoading(true);
@@ -1554,16 +1732,32 @@ ${JSON.stringify(context, null, 2)}
                                             )}
                                         </div>
                                         {newSale.product_id && (
-                                            <div className="animate-scale-in">
-                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Размер</label>
-                                                <select
-                                                    value={newSale.size}
-                                                    onChange={(e) => setNewSale({ ...newSale, size: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none"
-                                                >
-                                                    <option value="">Размер</option>
-                                                    {selectedProduct?.sizes?.map(s => <option key={s} value={s}>{s}</option>)}
-                                                </select>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-scale-in">
+                                                <div>
+                                                    <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цвет</label>
+                                                    <select
+                                                        value={newSale.color}
+                                                        onChange={(e) => setNewSale({ ...newSale, color: e.target.value, size: '' })}
+                                                        className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none"
+                                                    >
+                                                        <option value="">Выберите цвет</option>
+                                                        {selectedProduct?.colors?.map(c => <option key={c} value={c}>{c}</option>) ||
+                                                            (selectedProduct?.color && <option value={selectedProduct.color}>{selectedProduct.color}</option>)}
+                                                    </select>
+                                                </div>
+                                                {newSale.color && (
+                                                    <div className="animate-scale-in">
+                                                        <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Размер</label>
+                                                        <select
+                                                            value={newSale.size}
+                                                            onChange={(e) => setNewSale({ ...newSale, size: e.target.value })}
+                                                            className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none"
+                                                        >
+                                                            <option value="">Размер</option>
+                                                            {selectedProduct?.sizes?.map(s => <option key={s} value={s}>{s}</option>)}
+                                                        </select>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                         {newSale.size && (
@@ -1587,7 +1781,13 @@ ${JSON.stringify(context, null, 2)}
                                                     <p className="text-[9px] uppercase font-black text-gray tracking-[0.1em]">Доступно на складе</p>
                                                 </div>
                                                 <div className="flex items-baseline gap-1.5">
-                                                    <span className="text-xl font-black text-dark">{inventory[products.find(p => p.id === newSale.product_id)?.name || '']?.sizes[newSale.size] || 0}</span>
+                                                    <span className="text-xl font-black text-dark">
+                                                        {(() => {
+                                                            const p = products.find(prod => prod.id === newSale.product_id);
+                                                            const key = p ? `${p.name.trim()}:::${newSale.color || 'Без цвета'}` : '';
+                                                            return inventory[key]?.sizes[newSale.size] || 0;
+                                                        })()}
+                                                    </span>
                                                     <span className="text-[9px] font-black text-gray uppercase">шт</span>
                                                 </div>
                                             </div>
@@ -1641,7 +1841,7 @@ ${JSON.stringify(context, null, 2)}
                                     </h3>
 
 
-                                    <form onSubmit={handleAddPurchase} noValidate className="space-y-6">
+                                    <form onSubmit={handleAddPurchase} noValidate className="space-y-6 overflow-x-hidden p-1">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Название товара</label>
@@ -1653,38 +1853,108 @@ ${JSON.stringify(context, null, 2)}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Размер</label>
-                                                <select
-                                                    value={newPurchase.size}
-                                                    onChange={(e) => setNewPurchase({ ...newPurchase, size: e.target.value })}
+                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цвет</label>
+                                                <input
+                                                    type="text"
+                                                    value={newPurchase.color}
+                                                    onChange={(e) => setNewPurchase({ ...newPurchase, color: e.target.value })}
                                                     className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none"
-                                                >
-                                                    <option value="">Выберите размер</option>
-                                                    {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(s => (
-                                                        <option key={s} value={s}>{s}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Количество</label>
-                                                <input
-                                                    type="number"
-                                                    value={newPurchase.quantity}
-                                                    onChange={(e) => setNewPurchase({ ...newPurchase, quantity: e.target.value === '' ? '' : parseInt(e.target.value) })}
-                                                    onWheel={(e) => e.currentTarget.blur()}
-                                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                    placeholder="0"
+                                                    placeholder="Напр. Черный"
                                                 />
                                             </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цена закупки шт (₸)</label>
+                                                    <input
+                                                        type="number"
+                                                        value={newPurchase.purchase_price}
+                                                        onChange={(e) => setNewPurchase({ ...newPurchase, purchase_price: e.target.value })}
+                                                        onWheel={(e) => e.currentTarget.blur()}
+                                                        className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                        placeholder="0"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цена закупки шт (¥)</label>
+                                                    <input
+                                                        type="number"
+                                                        value={newPurchase.yuan_price}
+                                                        onChange={(e) => setNewPurchase({ ...newPurchase, yuan_price: e.target.value })}
+                                                        onWheel={(e) => e.currentTarget.blur()}
+                                                        className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                        placeholder="0"
+                                                    />
+                                                </div>
+                                            </div>
+
                                             <div>
-                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цена закупки (₸)</label>
-                                                <input
-                                                    type="number"
-                                                    value={newPurchase.purchase_price}
-                                                    onChange={(e) => setNewPurchase({ ...newPurchase, purchase_price: e.target.value })}
-                                                    onWheel={(e) => e.currentTarget.blur()}
-                                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                />
+                                                <div className="flex flex-col gap-6">
+                                                    {/* Clothes Sizes */}
+                                                    <div className="space-y-3">
+                                                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray/60">Одежда / Стандарт</label>
+                                                        <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 bg-light/20 p-3 rounded-apple-xl border border-light/50">
+                                                            {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                                                                <div key={size} className="flex flex-col gap-1">
+                                                                    <label className="text-[9px] font-black uppercase text-gray/50 text-center">{size}</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={newPurchase.stock_quantities[newPurchase.color || 'Без цвета']?.[size] || ''}
+                                                                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                                                                        onChange={(e) => setNewPurchase(prev => {
+                                                                            const colorKey = prev.color || 'Без цвета';
+                                                                            return {
+                                                                                ...prev,
+                                                                                stock_quantities: {
+                                                                                    ...prev.stock_quantities,
+                                                                                    [colorKey]: {
+                                                                                        ...(prev.stock_quantities[colorKey] || {}),
+                                                                                        [size]: e.target.value
+                                                                                    }
+                                                                                }
+                                                                            };
+                                                                        })}
+                                                                        className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-[16px] md:text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${newPurchase.stock_quantities[newPurchase.color || 'Без цвета']?.[size] ? 'bg-white border-dark shadow-sm' : 'bg-white/40 border-transparent focus:bg-white focus:border-dark/30'
+                                                                            }`}
+                                                                        placeholder="0"
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Shoe Sizes */}
+                                                    <div className="space-y-3">
+                                                        <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray/60">Обувь</label>
+                                                        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 bg-light/20 p-3 rounded-apple-xl border border-light/50">
+                                                            {['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(size => (
+                                                                <div key={size} className="flex flex-col gap-1">
+                                                                    <label className="text-[9px] font-black uppercase text-gray/50 text-center">{size}</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={newPurchase.stock_quantities[newPurchase.color || 'Без цвета']?.[size] || ''}
+                                                                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                                                                        onChange={(e) => setNewPurchase(prev => {
+                                                                            const colorKey = prev.color || 'Без цвета';
+                                                                            return {
+                                                                                ...prev,
+                                                                                stock_quantities: {
+                                                                                    ...prev.stock_quantities,
+                                                                                    [colorKey]: {
+                                                                                        ...(prev.stock_quantities[colorKey] || {}),
+                                                                                        [size]: e.target.value
+                                                                                    }
+                                                                                }
+                                                                            };
+                                                                        })}
+                                                                        className={`w-full px-1 py-2 text-center border-2 rounded-apple text-dark font-bold text-[16px] md:text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${newPurchase.stock_quantities[newPurchase.color || 'Без цвета']?.[size] ? 'bg-white border-dark shadow-sm' : 'bg-white/40 border-transparent focus:bg-white focus:border-dark/30'
+                                                                            }`}
+                                                                        placeholder="0"
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1753,7 +2023,7 @@ ${JSON.stringify(context, null, 2)}
                                                     <div>
                                                         <h4 className="text-[10px] uppercase tracking-widest font-black text-gray leading-tight">Позиций</h4>
                                                         <p className="text-2xl font-bold text-dark">
-                                                            {Object.keys(inventory).length}
+                                                            {Object.keys(warehouseInventory).length}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1766,7 +2036,7 @@ ${JSON.stringify(context, null, 2)}
                                                     <div>
                                                         <h4 className="text-[10px] uppercase tracking-widest font-black text-gray leading-tight">Единиц</h4>
                                                         <p className="text-2xl font-bold text-accent">
-                                                            {Object.values(inventory).reduce((sum, data) => sum + data.totalQty, 0)}
+                                                            {Object.values(warehouseInventory).reduce((sum, data) => sum + data.totalQty, 0)}
                                                         </p>
                                                     </div>
                                                     <button
@@ -1795,18 +2065,21 @@ ${JSON.stringify(context, null, 2)}
 
                                     {/* Inventory List */}
                                     {inputMode === 'warehouse' ? (
-                                        Object.entries(inventory).filter(([name]) => {
-                                            const product = products.find(p => p.name === name);
-                                            return product?.is_visible !== false;
-                                        }).length > 0 ? (
+                                        Object.keys(groupedWarehouseInventory).length > 0 ? (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                                                {Object.entries(inventory)
+                                                {Object.entries(groupedWarehouseInventory)
                                                     .filter(([name, data]) => {
                                                         const searchLower = searchQuery.toLowerCase();
-                                                        const product = products.find(p => p.name === name);
+                                                        const product = products.find(p => p.name.trim() === name.trim());
 
-                                                        const barcodeMatch = product?.barcode?.toLowerCase().includes(searchLower) || false;
-                                                        return name.toLowerCase().includes(searchLower) ||
+                                                        // CRITICAL: If product doesn't exist in Products tab, hide it from Warehouse
+                                                        if (!product || product.is_visible === false) return false;
+
+                                                        const barcodeMatch = product.barcode?.toLowerCase().includes(searchLower) || false;
+                                                        const colorMatch = Object.keys(data.variants).some(c => c.toLowerCase().includes(searchLower));
+
+                                                        return data.name.toLowerCase().includes(searchLower) ||
+                                                            colorMatch ||
                                                             data.category.toLowerCase().includes(searchLower) ||
                                                             barcodeMatch;
                                                     })
@@ -1817,7 +2090,7 @@ ${JSON.stringify(context, null, 2)}
                                                             <div key={name} className="animate-scale-in">
                                                                 <div className="bg-white rounded-apple-2xl overflow-hidden border border-light shadow-apple-sm hover:shadow-apple-lg transition-all duration-500 group flex flex-col h-full">
                                                                     <div className="p-4 md:p-6 flex-1">
-                                                                        <div className="flex justify-between items-start mb-4 md:mb-6">
+                                                                        <div className="flex justify-between items-start mb-6">
                                                                             <div className="flex items-center gap-3 md:gap-4">
                                                                                 {product?.image_url && (
                                                                                     <div className="w-12 h-12 md:w-14 md:h-14 rounded-apple-lg overflow-hidden border border-light flex-shrink-0">
@@ -1825,37 +2098,51 @@ ${JSON.stringify(context, null, 2)}
                                                                                     </div>
                                                                                 )}
                                                                                 <div>
-                                                                                    <span className="text-[8px] md:text-[9px] font-black text-accent uppercase tracking-[0.2em] block mb-0.5">
+                                                                                    <span className="text-[8px] md:text-[9px] font-black text-accent uppercase tracking-[0.2em] mb-0.5">
                                                                                         {data.category}
                                                                                     </span>
-                                                                                    <h4 className="text-base md:text-lg font-bold text-dark leading-tight group-hover:text-accent transition-colors line-clamp-2">{name}</h4>
+                                                                                    <h4 className="text-sm md:text-base font-bold text-dark leading-tight group-hover:text-accent transition-colors line-clamp-2">{data.name}</h4>
                                                                                 </div>
                                                                             </div>
                                                                             <div className="text-right flex-shrink-0">
-                                                                                <p className="text-[8px] md:text-[9px] uppercase font-black text-gray tracking-widest mb-0.5">Stock</p>
+                                                                                <p className="text-[8px] md:text-[9px] uppercase font-black text-gray tracking-widest mb-0.5 whitespace-nowrap">Всего</p>
                                                                                 <p className="text-lg md:text-xl font-black text-dark">{data.totalQty}</p>
                                                                             </div>
                                                                         </div>
 
-                                                                        <div className="space-y-3">
-                                                                            <div className="flex flex-wrap gap-2">
-                                                                                {Object.entries(data.sizes)
-                                                                                    .sort(([a], [b]) => {
-                                                                                        const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
-                                                                                        const aIndex = sizeOrder.indexOf(a);
-                                                                                        const bIndex = sizeOrder.indexOf(b);
-                                                                                        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-                                                                                        return a.localeCompare(b);
-                                                                                    })
-                                                                                    .map(([size, qty]) => (
-                                                                                        qty > 0 && (
-                                                                                            <div key={size} className="flex flex-col items-center bg-light/30 px-2 md:px-3 py-1.5 md:py-2 rounded-apple border border-light/50 min-w-[45px] md:min-w-[50px] transition-all hover:bg-white hover:shadow-soft">
-                                                                                                <span className="text-[8px] md:text-[9px] font-black text-gray uppercase tracking-widest mb-0.5 md:mb-1">{size}</span>
-                                                                                                <span className="text-[10px] md:text-sm font-bold text-dark">{qty}</span>
-                                                                                            </div>
-                                                                                        )
-                                                                                    ))}
-                                                                            </div>
+                                                                        <div className="space-y-6">
+                                                                            {Object.entries(data.variants).map(([color, variant]) => (
+                                                                                <div key={color} className={`space-y-2 pb-4 border-b border-light/50 last:border-0 last:pb-0 transition-opacity duration-300 ${product?.hidden_colors?.includes(color) ? 'opacity-40' : 'opacity-100'}`}>
+                                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                                        <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: getColorValue(color), border: isLightColor(getColorValue(color)) ? '1px solid #E5E7EB' : 'none' }}></span>
+                                                                                        <span className="text-[10px] font-black uppercase tracking-widest text-dark">{color}</span>
+                                                                                        <button
+                                                                                            onClick={() => product && handleToggleColorVisibility(product.id, color)}
+                                                                                            className="p-1 hover:text-accent transition-colors"
+                                                                                            title={product?.hidden_colors?.includes(color) ? 'Показать покупателям' : 'Скрыть от покупателей'}
+                                                                                        >
+                                                                                            {product?.hidden_colors?.includes(color) ? <EyeOff className="w-3 h-3 text-gray" /> : <Eye className="w-3 h-3 text-accent" />}
+                                                                                        </button>
+                                                                                        <span className="text-[9px] font-bold text-gray ml-auto">({variant.totalQty} шт)</span>
+                                                                                    </div>
+                                                                                    <div className="flex flex-wrap gap-1.5">
+                                                                                        {Object.entries(variant.sizes)
+                                                                                            .sort(([a], [b]) => {
+                                                                                                const sizeOrder = ['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'];
+                                                                                                const aIndex = sizeOrder.indexOf(a);
+                                                                                                const bIndex = sizeOrder.indexOf(b);
+                                                                                                if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                                                                                                return a.localeCompare(b);
+                                                                                            })
+                                                                                            .map(([size, qty]) => (
+                                                                                                <div key={size} className={`flex items-center gap-2 px-2 py-1 rounded-apple border transition-all ${qty > 0 ? 'bg-light/30 border-light/50 shadow-sm' : qty === 0 ? 'bg-gray-50 border-gray-100 opacity-60' : 'bg-red-50 border-red-100 text-red-500 underline decoration-dotted'}`}>
+                                                                                                    <span className={`text-[8px] font-black uppercase tracking-widest ${qty > 0 ? 'text-gray' : 'text-red-400'}`}>{size}</span>
+                                                                                                    <span className="text-[10px] font-bold">{qty}</span>
+                                                                                                </div>
+                                                                                            ))}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
                                                                         </div>
                                                                     </div>
 
@@ -1882,11 +2169,13 @@ ${JSON.stringify(context, null, 2)}
                                                                                             setBarcodeModalInput(product.barcode);
                                                                                             setBarcodeModalProduct(product);
                                                                                             setBarcodeModalStep('found');
+                                                                                            setSelectedBarcodeColor(product.colors?.[0] || product.color || 'Без цвета');
                                                                                             setBarcodeModalOpen(true);
                                                                                         } else {
                                                                                             setBarcodeModalAssignProduct(product);
                                                                                             setBarcodeModalInput('');
                                                                                             setBarcodeModalStep('assign');
+                                                                                            setSelectedBarcodeColor(product.colors?.[0] || product.color || 'Без цвета');
                                                                                             setBarcodeModalOpen(true);
                                                                                         }
                                                                                     } else {
@@ -1980,8 +2269,8 @@ ${JSON.stringify(context, null, 2)}
                                                                                 </td>
                                                                                 <td className="px-6 py-6 text-right">
                                                                                     <div className="space-y-0.5">
-                                                                                        <p className="text-[10px] text-gray font-bold whitespace-nowrap">Купил: {formatPrice(p.purchase_price)}</p>
-                                                                                        <p className="text-[10px] text-gray font-bold whitespace-nowrap">Доставка: {formatPrice(p.delivery_cost || 0)}</p>
+                                                                                        <p className="text-[10px] text-gray font-bold whitespace-nowrap">Купил: {formatPrice(p.purchase_price)} ₸ {p.yuan_price ? ` (¥${p.yuan_price})` : ''}</p>
+                                                                                        <p className="text-[10px] text-gray font-bold whitespace-nowrap">Доставка: {formatPrice(p.delivery_cost || 0)} ₸</p>
                                                                                         <p className="text-sm text-accent font-black whitespace-nowrap">{formatPrice(p.total_cost || p.purchase_price)} ₸</p>
                                                                                     </div>
                                                                                 </td>
@@ -2063,8 +2352,8 @@ ${JSON.stringify(context, null, 2)}
                                                                             <div className="space-y-2">
                                                                                 <p className="text-[10px] font-black text-gray uppercase tracking-widest">Финансы</p>
                                                                                 <div className="space-y-0.5">
-                                                                                    <p className="text-xs text-dark font-bold">Куп: {formatPrice(p.purchase_price)}</p>
-                                                                                    <p className="text-xs text-dark font-bold">Дост: {formatPrice(p.delivery_cost || 0)}</p>
+                                                                                    <p className="text-xs text-dark font-bold">Куп: {formatPrice(p.purchase_price)} ₸ {p.yuan_price ? ` (¥${p.yuan_price})` : ''}</p>
+                                                                                    <p className="text-xs text-dark font-bold">Дост: {formatPrice(p.delivery_cost || 0)} ₸</p>
                                                                                     <p className="text-sm text-accent font-black mt-1">Итого: {formatPrice(p.total_cost || p.purchase_price)} ₸</p>
                                                                                 </div>
                                                                             </div>
@@ -2175,7 +2464,10 @@ ${JSON.stringify(context, null, 2)}
                                                             </td>
                                                             <td className="px-6 py-4 text-right">
                                                                 <div className="flex flex-col items-end">
-                                                                    <p className="font-bold text-sm text-dark">{formatPrice(purchase.total_cost || purchase.purchase_price)} ₸</p>
+                                                                    <p className="font-bold text-sm text-dark">
+                                                                        {formatPrice(purchase.total_cost || purchase.purchase_price)} ₸
+                                                                        {purchase.yuan_price ? <span className="text-[10px] text-gray ml-1.5 font-bold">(¥{purchase.yuan_price})</span> : ''}
+                                                                    </p>
                                                                     <div className="flex items-center gap-1.5 font-black text-[9px] uppercase">
                                                                         <span className="text-gray">× {purchase.quantity}</span>
                                                                         <span className="text-gray-light bg-light px-1 rounded">Прил {purchase.source_app}</span>
@@ -2652,16 +2944,49 @@ ${JSON.stringify(context, null, 2)}
                                 </div>
 
                                 <div className="bg-white p-6 rounded-apple-lg border-2 border-accent/20 space-y-4">
-                                    <p className="text-xs font-black uppercase tracking-widest text-dark mb-4">Добавить остатки по размерам</p>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                                        <p className="text-xs font-black uppercase tracking-widest text-dark">Добавить остатки по размерам</p>
+                                        <div className="space-y-2">
+                                            <div className="flex flex-wrap gap-2">
+                                                {(() => {
+                                                    const productColors = barcodeModalProduct.colors?.length ? barcodeModalProduct.colors : (barcodeModalProduct.color ? [barcodeModalProduct.color] : ['Без цвета']);
+                                                    const uniqueColors = Array.from(new Set([...productColors, 'Без цвета']));
+                                                    return uniqueColors.map(c => (
+                                                        <button
+                                                            key={c}
+                                                            type="button"
+                                                            onClick={() => setSelectedBarcodeColor(c)}
+                                                            className={`group relative flex items-center gap-2 px-3 py-2 rounded-apple border-2 transition-all ${selectedBarcodeColor === c ? 'border-accent bg-accent/5' : 'border-light hover:border-gray/30 bg-white'}`}
+                                                            title={c}
+                                                        >
+                                                            <span className="w-4 h-4 rounded-full shadow-sm flex-shrink-0" style={{ backgroundColor: getColorValue(c), border: isLightColor(getColorValue(c)) ? '1px solid #E5E7EB' : 'none' }}></span>
+                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${selectedBarcodeColor === c ? 'text-accent' : 'text-gray'}`}>{c}</span>
+                                                            {selectedBarcodeColor === c && <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent text-white rounded-full flex items-center justify-center border border-white"><Check className="w-2 h-2" /></div>}
+                                                        </button>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                                         {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(size => (
                                             <div key={size} className="flex flex-col gap-1">
                                                 <label className="text-[10px] font-black uppercase text-gray text-center">{size}</label>
                                                 <input
                                                     type="number"
-                                                    value={stockAdditions[size] || ''}
-                                                    onChange={(e) => setStockAdditions(prev => ({ ...prev, [size]: e.target.value }))}
-                                                    className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-sm outline-none transition-all ${stockAdditions[size] ? 'bg-accent/10 border-accent' : 'bg-light border-transparent focus:bg-white focus:border-dark'
+                                                    onWheel={(e) => e.currentTarget.blur()}
+                                                    value={stockAdditions[selectedBarcodeColor || 'Без цвета']?.[size] || ''}
+                                                    onChange={(e) => setStockAdditions(prev => {
+                                                        const colorKey = selectedBarcodeColor || 'Без цвета';
+                                                        return {
+                                                            ...prev,
+                                                            [colorKey]: {
+                                                                ...(prev[colorKey] || {}),
+                                                                [size]: e.target.value
+                                                            }
+                                                        };
+                                                    })}
+                                                    className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${stockAdditions[selectedBarcodeColor || 'Без цвета']?.[size] ? 'bg-accent/10 border-accent' : 'bg-light border-transparent focus:bg-white focus:border-dark'
                                                         }`}
                                                     placeholder="0"
                                                 />
@@ -2691,16 +3016,49 @@ ${JSON.stringify(context, null, 2)}
                                 </div>
 
                                 <div className="bg-white p-6 rounded-apple-lg border-2 border-accent/20 space-y-4">
-                                    <p className="text-xs font-black uppercase tracking-widest text-dark mb-4">Добавить остатки по размерам (опционально)</p>
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                                        <p className="text-xs font-black uppercase tracking-widest text-dark">Добавить остатки по размерам (опционально)</p>
+                                        <div className="space-y-2">
+                                            <div className="flex flex-wrap gap-2">
+                                                {(() => {
+                                                    const productColors = barcodeModalAssignProduct.colors?.length ? barcodeModalAssignProduct.colors : (barcodeModalAssignProduct.color ? [barcodeModalAssignProduct.color] : ['Без цвета']);
+                                                    const uniqueColors = Array.from(new Set([...productColors, 'Без цвета']));
+                                                    return uniqueColors.map(c => (
+                                                        <button
+                                                            key={c}
+                                                            type="button"
+                                                            onClick={() => setSelectedBarcodeColor(c)}
+                                                            className={`group relative flex items-center gap-2 px-3 py-2 rounded-apple border-2 transition-all ${selectedBarcodeColor === c ? 'border-accent bg-accent/5' : 'border-light hover:border-gray/30 bg-white'}`}
+                                                            title={c}
+                                                        >
+                                                            <span className="w-4 h-4 rounded-full shadow-sm flex-shrink-0" style={{ backgroundColor: getColorValue(c), border: isLightColor(getColorValue(c)) ? '1px solid #E5E7EB' : 'none' }}></span>
+                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${selectedBarcodeColor === c ? 'text-accent' : 'text-gray'}`}>{c}</span>
+                                                            {selectedBarcodeColor === c && <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent text-white rounded-full flex items-center justify-center border border-white"><Check className="w-2 h-2" /></div>}
+                                                        </button>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                                         {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(size => (
                                             <div key={size} className="flex flex-col gap-1">
                                                 <label className="text-[10px] font-black uppercase text-gray text-center">{size}</label>
                                                 <input
                                                     type="number"
-                                                    value={stockAdditions[size] || ''}
-                                                    onChange={(e) => setStockAdditions(prev => ({ ...prev, [size]: e.target.value }))}
-                                                    className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-sm outline-none transition-all ${stockAdditions[size] ? 'bg-accent/10 border-accent' : 'bg-light border-transparent focus:bg-white focus:border-dark'
+                                                    onWheel={(e) => e.currentTarget.blur()}
+                                                    value={stockAdditions[selectedBarcodeColor || 'Без цвета']?.[size] || ''}
+                                                    onChange={(e) => setStockAdditions(prev => {
+                                                        const colorKey = selectedBarcodeColor || 'Без цвета';
+                                                        return {
+                                                            ...prev,
+                                                            [colorKey]: {
+                                                                ...(prev[colorKey] || {}),
+                                                                [size]: e.target.value
+                                                            }
+                                                        };
+                                                    })}
+                                                    className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${stockAdditions[selectedBarcodeColor || 'Без цвета']?.[size] ? 'bg-accent/10 border-accent' : 'bg-light border-transparent focus:bg-white focus:border-dark'
                                                         }`}
                                                     placeholder="0"
                                                 />
@@ -2734,75 +3092,160 @@ ${JSON.stringify(context, null, 2)}
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Название товара *</label>
-                                        <input
-                                            type="text"
-                                            value={newProductForm.name}
-                                            onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
-                                            className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
-                                            required
-                                        />
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Название товара *</label>
+                                            <input
+                                                type="text"
+                                                value={newProductForm.name}
+                                                onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
+                                                className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Категория *</label>
+                                            <select
+                                                value={newProductForm.category}
+                                                onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
+                                                className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
+                                                required
+                                            >
+                                                <option value="">Выберите категорию</option>
+                                                {CATEGORIES.map(cat => (
+                                                    <option key={cat} value={cat}>{cat}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цена (₸) *</label>
+                                            <input
+                                                type="number"
+                                                value={newProductForm.price}
+                                                onChange={(e) => setNewProductForm({ ...newProductForm, price: e.target.value })}
+                                                onWheel={(e) => e.currentTarget.blur()}
+                                                className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                required
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Категория *</label>
-                                        <select
-                                            value={newProductForm.category}
-                                            onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
-                                            className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
-                                            required
-                                        >
-                                            <option value="">Выберите категорию</option>
-                                            {CATEGORIES.map(cat => (
-                                                <option key={cat} value={cat}>{cat}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цена (₸) *</label>
-                                        <input
-                                            type="number"
-                                            value={newProductForm.price}
-                                            onChange={(e) => setNewProductForm({ ...newProductForm, price: e.target.value })}
-                                            onWheel={(e) => e.currentTarget.blur()}
-                                            className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Фото товара (Галерея)</label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {newProductForm.images.map((url, i) => (
-                                                <div key={i} className="relative w-16 h-16 rounded-apple overflow-hidden border border-light group">
-                                                    <img src={url} alt="" className="w-full h-full object-cover" />
-                                                    <button
-                                                        onClick={() => setNewProductForm(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
-                                                        className="absolute inset-0 bg-dark/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            <label className="w-16 h-16 bg-light border-2 border-dashed border-gray/20 rounded-apple flex items-center justify-center cursor-pointer hover:bg-gray/5 transition-all">
-                                                <Plus className="w-5 h-5 text-gray" />
-                                                <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                            </label>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Фото товара (Галерея)</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {newProductForm.images.map((url, i) => (
+                                                    <div key={i} className="relative w-16 h-16 rounded-apple overflow-hidden border border-light group">
+                                                        <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        <button
+                                                            onClick={() => setNewProductForm(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
+                                                            className="absolute inset-0 bg-dark/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                <label className="w-16 h-16 bg-light border-2 border-dashed border-gray/20 rounded-apple flex items-center justify-center cursor-pointer hover:bg-gray/5 transition-all">
+                                                    <Plus className="w-5 h-5 text-gray" />
+                                                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Описание</label>
+                                            <textarea
+                                                value={newProductForm.description}
+                                                onChange={(e) => setNewProductForm({ ...newProductForm, description: e.target.value })}
+                                                className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
+                                                rows={3}
+                                            />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Описание</label>
-                                    <textarea
-                                        value={newProductForm.description}
-                                        onChange={(e) => setNewProductForm({ ...newProductForm, description: e.target.value })}
-                                        className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
-                                        rows={3}
-                                    />
-                                </div>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="block text-xs font-black uppercase tracking-widest text-gray">Цвета и Размеры</label>
+                                        <div className="flex items-center gap-1.5">
+                                            <input
+                                                type="text"
+                                                value={newColorInput}
+                                                onChange={(e) => setNewColorInput(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        if (newColorInput.trim()) {
+                                                            const color = newColorInput.trim();
+                                                            setNewProductForm(prev => ({
+                                                                ...prev,
+                                                                selected_color: color
+                                                            }));
+                                                            setNewColorInput('');
+                                                        }
+                                                    }
+                                                }}
+                                                placeholder="Добавить цвет..."
+                                                className="w-24 px-2 py-1.5 bg-light border border-transparent rounded-apple text-[10px] font-bold outline-none focus:bg-white focus:border-accent/30 transition-all"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (newColorInput.trim()) {
+                                                        const color = newColorInput.trim();
+                                                        setNewProductForm(prev => ({
+                                                            ...prev,
+                                                            selected_color: color
+                                                        }));
+                                                        setNewColorInput('');
+                                                    }
+                                                }}
+                                                className="p-1.5 bg-accent/10 text-accent rounded-apple hover:bg-accent hover:text-white transition-all"
+                                            >
+                                                <Plus className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                <div>
-                                    <label className="block text-xs font-black uppercase tracking-widest text-gray mb-3">Размеры и количество</label>
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {(() => {
+                                            const colorsWithStock = Object.keys(newProductForm.stock_quantities);
+                                            const activeColor = newProductForm.selected_color || 'Без цвета';
+                                            const allVisibleColors = Array.from(new Set([activeColor, ...colorsWithStock]));
+
+                                            return allVisibleColors.map(c => (
+                                                <div key={c} className="relative group">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setNewProductForm(prev => ({ ...prev, selected_color: c }))}
+                                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-apple border-2 transition-all ${activeColor === c ? 'border-accent bg-accent/5' : 'border-light hover:border-gray/30 bg-white'}`}
+                                                    >
+                                                        <span className="w-3 h-3 rounded-full shadow-sm flex-shrink-0" style={{ backgroundColor: getColorValue(c), border: isLightColor(getColorValue(c)) ? '1px solid #E5E7EB' : 'none' }}></span>
+                                                        <span className={`text-[10px] font-black uppercase tracking-widest ${activeColor === c ? 'text-accent' : 'text-gray'}`}>{c}</span>
+                                                    </button>
+                                                    {c !== 'Без цвета' && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setNewProductForm(prev => {
+                                                                    const { [c]: _, ...rest } = prev.stock_quantities;
+                                                                    return {
+                                                                        ...prev,
+                                                                        selected_color: prev.selected_color === c ? '' : prev.selected_color,
+                                                                        stock_quantities: rest
+                                                                    };
+                                                                });
+                                                            }}
+                                                            className="absolute -top-2 -right-2 w-4 h-4 bg-white border border-light text-accent rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm hover:bg-light"
+                                                        >
+                                                            <X className="w-2.5 h-2.5" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ));
+                                        })()}
+                                    </div>
+
                                     <div className="bg-light/30 p-4 rounded-apple-lg border border-light">
                                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                                             {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(size => (
@@ -2810,13 +3253,22 @@ ${JSON.stringify(context, null, 2)}
                                                     <label className="text-[10px] font-black uppercase text-gray text-center">{size}</label>
                                                     <input
                                                         type="number"
-                                                        value={newProductForm.stock_quantities[size] || ''}
+                                                        value={newProductForm.stock_quantities[newProductForm.selected_color || 'Без цвета']?.[size] || ''}
                                                         onWheel={(e) => e.currentTarget.blur()}
-                                                        onChange={(e) => setNewProductForm(prev => ({
-                                                            ...prev,
-                                                            stock_quantities: { ...prev.stock_quantities, [size]: e.target.value }
-                                                        }))}
-                                                        className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-sm outline-none transition-all ${newProductForm.stock_quantities[size] ? 'bg-white border-dark shadow-sm' : 'bg-white/50 border-transparent focus:bg-white focus:border-dark/50'
+                                                        onChange={(e) => setNewProductForm(prev => {
+                                                            const colorKey = prev.selected_color || 'Без цвета';
+                                                            return {
+                                                                ...prev,
+                                                                stock_quantities: {
+                                                                    ...prev.stock_quantities,
+                                                                    [colorKey]: {
+                                                                        ...(prev.stock_quantities[colorKey] || {}),
+                                                                        [size]: e.target.value
+                                                                    }
+                                                                }
+                                                            };
+                                                        })}
+                                                        className={`w-full px-2 py-2 text-center border-2 rounded-apple text-dark font-bold text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${newProductForm.stock_quantities[newProductForm.selected_color || 'Без цвета']?.[size] ? 'bg-white border-dark shadow-sm' : 'bg-white/50 border-transparent focus:bg-white focus:border-dark/50'
                                                             }`}
                                                         placeholder="0"
                                                     />
@@ -2843,9 +3295,9 @@ ${JSON.stringify(context, null, 2)}
                             </div>
                         )}
                     </div>
-                </Modal >
+                </Modal>
                 {/* Edit Product Modal */}
-                <Modal
+                < Modal
                     isOpen={isEditModalOpen}
                     onClose={() => setIsEditModalOpen(false)}
                     title="Редактировать товар"
@@ -2881,7 +3333,7 @@ ${JSON.stringify(context, null, 2)}
                                     value={editForm.price}
                                     onWheel={(e) => e.currentTarget.blur()}
                                     onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
+                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     required
                                 />
                             </div>
@@ -2902,11 +3354,108 @@ ${JSON.stringify(context, null, 2)}
                                     className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none min-h-[100px]"
                                 />
                             </div>
+
                             <div>
-                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-4">Размеры и остатки</label>
+                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Фото товара (Галерея)</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {(editForm.images || []).map((url, i) => (
+                                        <div key={i} className="relative w-16 h-16 rounded-apple overflow-hidden border border-light group">
+                                            <img src={url} alt="" className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => setEditForm(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
+                                                className="absolute inset-0 bg-dark/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <label className="w-16 h-16 bg-light border-2 border-dashed border-gray/20 rounded-apple flex items-center justify-center cursor-pointer hover:bg-gray/5 transition-all">
+                                        <Plus className="w-5 h-5 text-gray" />
+                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-apple-lg border-2 border-accent/20 space-y-4">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                                    <label className="block text-xs font-black uppercase tracking-widest text-dark">Размеры и остатки</label>
+                                    <div className="space-y-4">
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            {(() => {
+                                                const displayColors = editForm.colors.length > 0 ? editForm.colors : ['Без цвета'];
+                                                return displayColors.map(c => (
+                                                    <div key={c} className="relative group">
+                                                        <button
+                                                            key={c}
+                                                            type="button"
+                                                            onClick={() => setSelectedBarcodeColor(c)}
+                                                            className={`flex items-center gap-2 px-3 py-2 rounded-apple border-2 transition-all ${selectedBarcodeColor === c ? 'border-accent bg-accent/5' : 'border-light hover:border-gray/30 bg-white'}`}
+                                                            title={c}
+                                                        >
+                                                            <span className="w-4 h-4 rounded-full shadow-sm flex-shrink-0" style={{ backgroundColor: getColorValue(c), border: isLightColor(getColorValue(c)) ? '1px solid #E5E7EB' : 'none' }}></span>
+                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${selectedBarcodeColor === c ? 'text-accent' : 'text-gray'}`}>{c}</span>
+                                                            {selectedBarcodeColor === c && <div className="absolute -top-1 -left-1 w-3 h-3 bg-accent text-white rounded-full flex items-center justify-center border border-white"><Check className="w-2 h-2" /></div>}
+                                                        </button>
+                                                        {editForm.colors.includes(c) && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const newColors = editForm.colors.filter(col => col !== c);
+                                                                    setEditForm({ ...editForm, colors: newColors });
+                                                                    if (selectedBarcodeColor === c) {
+                                                                        setSelectedBarcodeColor(newColors[0] || 'Без цвета');
+                                                                    }
+                                                                }}
+                                                                className="absolute -top-2 -right-2 w-5 h-5 bg-white border border-light text-accent rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm hover:bg-light"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ));
+                                            })()}
+
+                                            <div className="flex items-center gap-1.5 ml-2">
+                                                <input
+                                                    type="text"
+                                                    value={newEditColorInput}
+                                                    onChange={(e) => setNewEditColorInput(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            if (newEditColorInput.trim() && !editForm.colors.includes(newEditColorInput.trim())) {
+                                                                setEditForm({ ...editForm, colors: [...editForm.colors, newEditColorInput.trim()] });
+                                                                setSelectedBarcodeColor(newEditColorInput.trim());
+                                                                setNewEditColorInput('');
+                                                            }
+                                                        }
+                                                    }}
+                                                    placeholder="Новый цвет..."
+                                                    className="w-28 px-2 py-1.5 bg-light border border-transparent rounded-apple text-[10px] font-bold outline-none focus:bg-white focus:border-accent/30 transition-all"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (newEditColorInput.trim() && !editForm.colors.includes(newEditColorInput.trim())) {
+                                                            setEditForm({ ...editForm, colors: [...editForm.colors, newEditColorInput.trim()] });
+                                                            setSelectedBarcodeColor(newEditColorInput.trim());
+                                                            setNewEditColorInput('');
+                                                        }
+                                                    }}
+                                                    className="p-1.5 bg-accent/10 text-accent rounded-apple hover:bg-accent hover:text-white transition-all"
+                                                >
+                                                    <Plus className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(size => {
                                         const isSelected = editForm.sizes.includes(size);
+                                        const colorKey = selectedBarcodeColor || 'Без цвета';
                                         return (
                                             <div key={size} className={`p-3 rounded-apple-lg border-2 transition-all ${isSelected ? 'border-accent/20 bg-accent/5' : 'border-transparent bg-light/50 opacity-60'}`}>
                                                 <div className="flex items-center justify-between mb-2">
@@ -2927,13 +3476,22 @@ ${JSON.stringify(context, null, 2)}
                                                 {isSelected && (
                                                     <input
                                                         type="number"
-                                                        value={editForm.stockQuantities[size] || ''}
+                                                        value={editForm.stockQuantities[colorKey]?.[size] || ''}
                                                         onWheel={(e) => e.currentTarget.blur()}
-                                                        onChange={(e) => setEditForm({
-                                                            ...editForm,
-                                                            stockQuantities: { ...editForm.stockQuantities, [size]: e.target.value }
+                                                        onChange={(e) => setEditForm(prev => {
+                                                            const targetColor = selectedBarcodeColor || 'Без цвета';
+                                                            return {
+                                                                ...prev,
+                                                                stockQuantities: {
+                                                                    ...prev.stockQuantities,
+                                                                    [targetColor]: {
+                                                                        ...(prev.stockQuantities[targetColor] || {}),
+                                                                        [size]: e.target.value
+                                                                    }
+                                                                }
+                                                            };
                                                         })}
-                                                        className="w-full px-2 py-1.5 bg-white border border-accent/20 rounded-apple text-dark font-bold text-xs outline-none focus:border-accent"
+                                                        className="w-full px-2 py-1.5 bg-white border border-accent/20 rounded-apple text-dark font-bold text-xs outline-none focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                         placeholder="0"
                                                     />
                                                 )}
@@ -2962,9 +3520,9 @@ ${JSON.stringify(context, null, 2)}
                             </Button>
                         </div>
                     </form>
-                </Modal>
+                </Modal >
                 {/* Receipt Preview Modal */}
-                <Modal
+                < Modal
                     isOpen={isReceiptModalOpen}
                     onClose={() => setIsReceiptModalOpen(false)}
                     title="Предпросмотр чека"
@@ -2997,10 +3555,10 @@ ${JSON.stringify(context, null, 2)}
                             </p>
                         </div>
                     )}
-                </Modal>
+                </Modal >
 
                 {/* Purchase Deletion Confirmation Modal */}
-                <Modal
+                < Modal
                     isOpen={isPurchaseDeleteModalOpen}
                     onClose={() => {
                         setIsPurchaseDeleteModalOpen(false);
@@ -3043,7 +3601,7 @@ ${JSON.stringify(context, null, 2)}
                             </Button>
                         </div>
                     </div>
-                </Modal>
+                </Modal >
             </div >
 
             <div style={{ position: 'fixed', left: '0', top: '0', width: '340px', height: '1px', overflow: 'hidden', zIndex: -100, opacity: 1, pointerEvents: 'none' }}>

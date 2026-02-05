@@ -25,7 +25,7 @@ export const Home: React.FC = () => {
             const products = await productService.getFeaturedProducts();
             const visibleProducts = products.filter(p => p.is_visible !== false);
             const avail = await inventoryService.fetchAvailability();
-            const inStock = visibleProducts.filter(p => inventoryService.totalForName(avail, p.name) > 0);
+            const inStock = visibleProducts.filter(p => inventoryService.totalVisibleForProduct(avail, p.name, p.hidden_colors) > 0);
             console.log('Home: Products loaded (in stock):', inStock.length);
             setFeaturedProducts(inStock);
         } catch (error) {

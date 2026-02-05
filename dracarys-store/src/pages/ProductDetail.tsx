@@ -10,6 +10,7 @@ import { useToastStore } from '../store/toastStore';
 import type { Product } from '../types/database';
 import { capitalizeCategory, formatPrice, hasDiscount } from '../utils/formatters';
 import { inventoryService, type AvailabilityMap } from '../services/inventoryService';
+import { getColorValue, isLightColor } from '../utils/colors';
 
 export const ProductDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ export const ProductDetail: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [availability, setAvailability] = useState<AvailabilityMap>({});
     const [selectedSize, setSelectedSize] = useState<string>('');
+    const [selectedColor, setSelectedColor] = useState<string>('');
     const { addItem } = useCartStore();
     const { addToast } = useToastStore();
 
@@ -35,6 +37,8 @@ export const ProductDetail: React.FC = () => {
             }
 
             setProduct(data);
+            const visibleColors = (data.colors || []).filter(c => !data.hidden_colors?.includes(c));
+            setSelectedColor(visibleColors[0] || data.color || 'Без цвета');
             const avail = await inventoryService.fetchAvailability();
             setAvailability(avail);
 
@@ -65,22 +69,31 @@ export const ProductDetail: React.FC = () => {
     const handleAddToCart = () => {
         if (!product) return;
 
+        if (product.colors && product.colors.length > 0 && !selectedColor) {
+            addToast('info', 'Пожалуйста, выберите цвет');
+            return;
+        }
+
         if (product.sizes && product.sizes.length > 0 && !selectedSize) {
             addToast('info', 'Пожалуйста, выберите размер');
             return;
         }
 
-        // Enforce per-size availability
-        const maxQty = inventoryService.qtyFor(availability, product.name, selectedSize);
-        const existing = useCartStore.getState().items.find(i => i.id === product.id && i.selectedSize === selectedSize);
+        // Enforce per-variant availability
+        const maxQty = inventoryService.qtyFor(availability, product.name, selectedColor, selectedSize);
+        const existing = useCartStore.getState().items.find(i =>
+            i.id === product.id &&
+            i.selectedSize === selectedSize &&
+            i.selectedColor === selectedColor
+        );
         const currentQty = existing?.quantity || 0;
         if (maxQty > 0 && currentQty >= maxQty) {
-            addToast('info', `Доступно только ${maxQty} шт. для размера ${selectedSize || ''}`);
+            addToast('info', `Доступно только ${maxQty} шт. для выбранного варианта`);
             return;
         }
 
-        addItem(product, selectedSize);
-        addToast('success', `${product.name} ${selectedSize ? `(${selectedSize}) ` : ''}в корзине`);
+        addItem(product, selectedSize, selectedColor);
+        addToast('success', `${product.name} успешно добавлен в корзину`);
     };
 
     if (isLoading) {
@@ -175,11 +188,73 @@ export const ProductDetail: React.FC = () => {
                             </p>
                         )}
 
+                        {/* Color Selection */}
+                        {product.colors && product.colors.length > 0 && (
+                            <div className="mb-10 space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-gray">Выберите цвет</h3>
+                                    {selectedColor && <span className="text-xs font-black text-dark uppercase tracking-widest">Выбрано: {selectedColor}</span>}
+                                </div>
+                                <div className="flex flex-wrap gap-4">
+                                    {product.colors
+                                        .filter(c => !product.hidden_colors?.includes(c))
+                                        .map(c => {
+                                            const colorValue = getColorValue(c);
+                                            const isSelected = selectedColor === c;
+                                            const hasStock = inventoryService.qtyFor(availability, product.name, c) > 0;
+
+                                            return (
+                                                <button
+                                                    key={c}
+                                                    onClick={() => {
+                                                        setSelectedColor(c);
+                                                        setSelectedSize(''); // Reset size on color change
+                                                    }}
+                                                    className={`group relative flex flex-col items-center gap-2 outline-none ${!hasStock ? 'opacity-40 grayscale' : ''}`}
+                                                    title={!hasStock ? 'Нет в наличии' : c}
+                                                >
+                                                    <div className={`w-12 h-12 rounded-full border-2 transition-all p-1 ${isSelected ? 'border-dark' : 'border-transparent group-hover:border-gray-light'}`}>
+                                                        <div
+                                                            className="w-full h-full rounded-full shadow-inner"
+                                                            style={{
+                                                                backgroundColor: colorValue,
+                                                                border: isLightColor(colorValue) ? '1px solid #E5E7EB' : '1px solid rgba(0,0,0,0.05)'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isSelected ? 'text-dark' : 'text-gray'}`}>
+                                                        {c}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Legacy Color Display */}
+                        {!product.colors?.length && product.color && (
+                            <div className="mb-8">
+                                <h3 className="text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цвет</h3>
+                                <div className="flex items-center gap-3">
+                                    <div
+                                        className="w-6 h-6 rounded-full"
+                                        style={{
+                                            backgroundColor: getColorValue(product.color),
+                                            border: isLightColor(getColorValue(product.color)) ? '1px solid #E5E7EB' : '1px solid rgba(0,0,0,0.1)'
+                                        }}
+                                    />
+                                    <p className="text-xl font-bold text-dark">{product.color}</p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Size Selection */}
                         {(() => {
-                            // Combine sizes from DB and sizes with actual stock
-                            const stockSizes = availability[product.name.trim()]
-                                ? Object.entries(availability[product.name.trim()])
+                            // Combine sizes from DB and sizes with actual stock for the SELECTED COLOR
+                            const colorKey = selectedColor || 'Без цвета';
+                            const stockSizes = availability[product.name.trim()]?.[colorKey]
+                                ? Object.entries(availability[product.name.trim()][colorKey])
                                     .filter(([_, qty]) => qty > 0)
                                     .map(([s]) => s)
                                 : [];
@@ -205,7 +280,7 @@ export const ProductDetail: React.FC = () => {
                                                 return a.localeCompare(b);
                                             })
                                             .map(size => {
-                                                const qty = inventoryService.qtyFor(availability, product.name, size);
+                                                const qty = inventoryService.qtyFor(availability, product.name, selectedColor, size);
                                                 const disabled = qty <= 0;
                                                 return (
                                                     <button
