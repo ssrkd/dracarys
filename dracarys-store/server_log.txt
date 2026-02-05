@@ -1,0 +1,1638 @@
+2026-02-04T10:43:53.930Z vite:config config file loaded in 60.64ms
+2026-02-04T10:43:53.931Z vite:env loading env files: [
+  '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/.env',
+  '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/.env.local',
+  '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/.env.development',
+  '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/.env.development.local'
+]
+2026-02-04T10:43:53.933Z vite:env env files loaded in 1.45ms
+2026-02-04T10:43:53.933Z vite:env using resolved env: {
+  VITE_SUPABASE_URL: 'https://cziduzwylkdxeuywwsiw.supabase.co',
+  VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6aWR1end5bGtkeGV1eXd3c2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMjIxMDIsImV4cCI6MjA4NDc5ODEwMn0.TdUHaLaVdtFb2YYZ5Xyiwe8NyQ0Njz88hqYmZwTsgpA'
+}
+2026-02-04T10:43:53.941Z vite:config using resolved config: {
+  plugins: [
+    'vite:optimized-deps',
+    'vite:watch-package-data',
+    'vite:pre-alias',
+    'alias',
+    'vite:react-babel',
+    'vite:react-refresh',
+    'vite:modulepreload-polyfill',
+    'vite:resolve',
+    'vite:html-inline-proxy',
+    'vite:css',
+    'vite:esbuild',
+    'vite:json',
+    'vite:wasm-helper',
+    'vite:worker',
+    'vite:asset',
+    'vite:react-virtual-preamble',
+    'vite:wasm-fallback',
+    'vite:define',
+    'vite:css-post',
+    'vite:worker-import-meta-url',
+    'vite:asset-import-meta-url',
+    'vite:dynamic-import-vars',
+    'vite:import-glob',
+    'vite:client-inject',
+    'vite:css-analysis',
+    'vite:import-analysis'
+  ],
+  server: {
+    port: 5173,
+    strictPort: false,
+    host: true,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {},
+    warmup: { clientFiles: [], ssrFiles: [] },
+    middlewareMode: false,
+    fs: {
+      strict: true,
+      deny: [ '.env', '.env.*', '*.{crt,pem}', '**/.git/**' ],
+      allow: [ '/Users/serik08/Documents/GitHub/dracarys/dracarys-store' ]
+    },
+    preTransformRequests: true,
+    perEnvironmentStartEndDuringDev: false,
+    perEnvironmentWatchChangeDuringDev: false,
+    sourcemapIgnoreList: [Function: isInNodeModules]
+  },
+  esbuild: {
+    jsxDev: true,
+    charset: 'utf8',
+    legalComments: 'none',
+    jsx: 'automatic',
+    jsxImportSource: undefined
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-dev-runtime',
+      'react/jsx-runtime'
+    ],
+    exclude: [],
+    needsInterop: [],
+    extensions: [],
+    disabled: undefined,
+    holdUntilCrawlEnd: true,
+    force: false,
+    ignoreOutdatedRequests: false,
+    noDiscovery: false,
+    esbuildOptions: { preserveSymlinks: false, jsx: 'automatic' }
+  },
+  build: {
+    target: [ 'chrome107', 'edge107', 'firefox104', 'safari16' ],
+    polyfillModulePreload: true,
+    modulePreload: { polyfill: true },
+    outDir: 'dist',
+    assetsDir: 'assets',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    terserOptions: {},
+    rollupOptions: { onwarn: [Function: onwarn] },
+    commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+    dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+    write: true,
+    emptyOutDir: null,
+    copyPublicDir: true,
+    license: false,
+    manifest: false,
+    lib: false,
+    ssrManifest: false,
+    ssrEmitAssets: false,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
+    watch: null,
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    ssr: false,
+    emitAssets: false,
+    createEnvironment: [Function: createEnvironment],
+    cssTarget: [ 'chrome107', 'edge107', 'firefox104', 'safari16' ],
+    cssMinify: true
+  },
+  environments: {
+    client: {
+      define: undefined,
+      resolve: {
+        externalConditions: [ 'node', 'module-sync' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'browser', 'development|production' ],
+        builtins: []
+      },
+      keepProcessEnv: false,
+      consumer: 'client',
+      optimizeDeps: {
+        include: [
+          'react',
+          'react-dom',
+          'react/jsx-dev-runtime',
+          'react/jsx-runtime'
+        ],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        ignoreOutdatedRequests: false,
+        noDiscovery: false,
+        esbuildOptions: { preserveSymlinks: false, jsx: 'automatic' }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules],
+        preTransformRequests: true,
+        createEnvironment: [Function: defaultCreateClientDevEnvironment],
+        recoverable: true,
+        moduleRunnerTransform: false
+      },
+      build: {
+        target: [ 'chrome107', 'edge107', 'firefox104', 'safari16' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'dist',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: { onwarn: [Function: onwarn] },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        license: false,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        ssr: false,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: [ 'chrome107', 'edge107', 'firefox104', 'safari16' ],
+        cssMinify: true
+      },
+      plugins: [
+        {
+          name: 'vite:optimized-deps',
+          applyToEnvironment: [Function: applyToEnvironment],
+          resolveId: [Function: resolveId],
+          load: [AsyncFunction: load]
+        },
+        {
+          name: 'vite:watch-package-data',
+          buildStart: [Function: buildStart],
+          buildEnd: [Function: buildEnd],
+          watchChange: [Function: watchChange]
+        },
+        {
+          name: 'vite:pre-alias',
+          applyToEnvironment: [Function: applyToEnvironment],
+          resolveId: [AsyncFunction: resolveId]
+        },
+        {
+          name: 'alias',
+          buildStart: [AsyncFunction: buildStart],
+          resolveId: [Function: resolveId]
+        },
+        {
+          name: 'vite:react-babel',
+          enforce: 'pre',
+          config: [Function: config],
+          configResolved: [Function: configResolved],
+          options: [Function: options],
+          transform: {
+            filter: {
+              id: {
+                include: /\.[tj]sx?(?:\?.*)?$/,
+                exclude: /\/node_modules\//
+              }
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:react-refresh',
+          enforce: 'pre',
+          config: [Function: config],
+          resolveId: {
+            filter: { id: /^\/@react\-refresh$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^\/@react\-refresh$/ },
+            handler: [Function: handler]
+          },
+          transformIndexHtml: [Function: transformIndexHtml]
+        },
+        {
+          name: 'vite:modulepreload-polyfill',
+          resolveId: {
+            filter: { id: /^vite\/modulepreload\-polyfill$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^ vite\/modulepreload\-polyfill\.js$/ },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:resolve',
+          resolveId: {
+            filter: { id: { exclude: /^(?:\0|\/?virtual:)/ } },
+            handler: [AsyncFunction: handler]
+          },
+          load: {
+            filter: {
+              id: [
+                /^__vite\-browser\-external/,
+                /^__vite\-optional\-peer\-dep/
+              ]
+            },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:html-inline-proxy',
+          resolveId: {
+            filter: { id: /[?&]html-proxy\b/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /[?&]html-proxy\b/ },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:css',
+          buildStart: [Function: buildStart],
+          buildEnd: [Function: buildEnd],
+          load: {
+            filter: {
+              id: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/
+            },
+            handler: [AsyncFunction: handler]
+          },
+          transform: {
+            filter: {
+              id: {
+                include: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/,
+                exclude: [
+                  /[?&]commonjs-proxy/,
+                  /[?&](?:worker|sharedworker|raw|url)\b/
+                ]
+              }
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:esbuild',
+          configureServer: [Function: configureServer],
+          transform: [AsyncFunction: transform]
+        },
+        {
+          name: 'vite:json',
+          transform: {
+            filter: {
+              id: {
+                include: /\.json(?:$|\?)(?!commonjs-(?:proxy|external))/,
+                exclude: /[?&](?:worker|sharedworker|raw|url)\b/
+              }
+            },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:wasm-helper',
+          resolveId: {
+            filter: { id: /^ vite\/wasm\-helper\.js$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: {
+              id: [
+                /^ vite\/wasm\-helper\.js$/,
+                /(?<![?#].*)\.wasm\?init/
+              ]
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:worker',
+          buildStart: [Function: buildStart],
+          load: {
+            filter: { id: /(?:\?|&)(worker|sharedworker)(?:&|$)/ },
+            handler: [AsyncFunction: handler]
+          },
+          transform: {
+            filter: { id: /(?:\?|&)worker_file&type=(\w+)(?:&|$)/ },
+            handler: [AsyncFunction: handler]
+          },
+          renderChunk: [Function: renderChunk],
+          generateBundle: [Function: generateBundle],
+          watchChange: [Function: watchChange]
+        },
+        {
+          name: 'vite:asset',
+          perEnvironmentStartEndDuringDev: true,
+          buildStart: [Function: buildStart],
+          resolveId: { handler: [Function: handler] },
+          load: {
+            filter: { id: { exclude: /^\0/ } },
+            handler: [AsyncFunction: handler]
+          },
+          renderChunk: [Function: renderChunk],
+          generateBundle: [Function: generateBundle]
+        },
+        {
+          name: 'vite:react-virtual-preamble',
+          resolveId: {
+            order: 'pre',
+            filter: { id: /^@vitejs\/plugin\-react\/preamble$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^ @vitejs\/plugin\-react\/preamble$/ },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:wasm-fallback',
+          load: { filter: { id: /\.wasm$/ }, handler: [Function: handler] }
+        },
+        {
+          name: 'vite:define',
+          transform: { handler: [AsyncFunction: handler] }
+        },
+        {
+          name: 'vite:css-post',
+          renderStart: [Function: renderStart],
+          transform: {
+            filter: {
+              id: {
+                include: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/,
+                exclude: [
+                  /[?&]commonjs-proxy/,
+                  /[?&](?:worker|sharedworker|raw|url)\b/
+                ]
+              }
+            },
+            handler: [AsyncFunction: handler]
+          },
+          renderChunk: [AsyncFunction: renderChunk],
+          augmentChunkHash: [Function: augmentChunkHash],
+          generateBundle: [AsyncFunction: generateBundle]
+        },
+        {
+          name: 'vite:worker-import-meta-url',
+          applyToEnvironment: [Function: applyToEnvironment],
+          transform: {
+            filter: {
+              code: /new\s+(?:Worker|SharedWorker)\s*\(\s*new\s+URL.+?import\.meta\.url/s
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:asset-import-meta-url',
+          applyToEnvironment: [Function: applyToEnvironment],
+          transform: {
+            filter: {
+              id: {
+                exclude: [
+                  /^ vite\/preload\-helper\.js$/,
+                  /^\/Users\/serik08\/Documents\/GitHub\/dracarys\/dracarys\-store\/node_modules\/vite\/dist\/client\/client\.mjs$/
+                ]
+              },
+              code: /new\s+URL.+import\.meta\.url/s
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:dynamic-import-vars',
+          resolveId: {
+            filter: { id: /^ vite\/dynamic\-import\-helper\.js$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^ vite\/dynamic\-import\-helper\.js$/ },
+            handler: [Function: handler]
+          },
+          transform: {
+            filter: {
+              id: {
+                exclude: /^\/Users\/serik08\/Documents\/GitHub\/dracarys\/dracarys\-store\/node_modules\/vite\/dist\/client\/client\.mjs$/
+              },
+              code: /\bimport\s*[(/]/
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:import-glob',
+          buildStart: [Function: buildStart],
+          transform: {
+            filter: { code: 'import.meta.glob' },
+            handler: [AsyncFunction: handler]
+          },
+          hotUpdate: [Function: hotUpdate]
+        },
+        {
+          name: 'vite:client-inject',
+          buildStart: [AsyncFunction: buildStart],
+          transform: [AsyncFunction: transform]
+        },
+        {
+          name: 'vite:css-analysis',
+          transform: {
+            filter: {
+              id: {
+                include: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/,
+                exclude: [
+                  /[?&]commonjs-proxy/,
+                  /[?&](?:worker|sharedworker|raw|url)\b/
+                ]
+              }
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:import-analysis',
+          transform: [AsyncFunction: transform]
+        }
+      ]
+    },
+    ssr: {
+      define: undefined,
+      resolve: {
+        externalConditions: [ 'node', 'module-sync' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'node', 'development|production' ],
+        builtins: [
+          '_http_agent',         '_http_client',        '_http_common',
+          '_http_incoming',      '_http_outgoing',      '_http_server',
+          '_stream_duplex',      '_stream_passthrough', '_stream_readable',
+          '_stream_transform',   '_stream_wrap',        '_stream_writable',
+          '_tls_common',         '_tls_wrap',           'assert',
+          'assert/strict',       'async_hooks',         'buffer',
+          'child_process',       'cluster',             'console',
+          'constants',           'crypto',              'dgram',
+          'diagnostics_channel', 'dns',                 'dns/promises',
+          'domain',              'events',              'fs',
+          'fs/promises',         'http',                'http2',
+          'https',               'inspector',           'inspector/promises',
+          'module',              'net',                 'os',
+          'path',                'path/posix',          'path/win32',
+          'perf_hooks',          'process',             'punycode',
+          'querystring',         'readline',            'readline/promises',
+          'repl',                'stream',              'stream/consumers',
+          'stream/promises',     'stream/web',          'string_decoder',
+          'sys',                 'timers',              'timers/promises',
+          'tls',                 'trace_events',        'tty',
+          'url',                 'util',                'util/types',
+          'v8',                  'vm',                  'wasi',
+          'worker_threads',      'zlib',                /^node:/,
+          /^bun:/
+        ]
+      },
+      keepProcessEnv: true,
+      consumer: 'server',
+      optimizeDeps: {
+        include: [],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        ignoreOutdatedRequests: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules],
+        preTransformRequests: false,
+        createEnvironment: [Function: defaultCreateDevEnvironment],
+        recoverable: false,
+        moduleRunnerTransform: true
+      },
+      build: {
+        target: [ 'chrome107', 'edge107', 'firefox104', 'safari16' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'dist',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: { onwarn: [Function: onwarn] },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        license: false,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: false,
+        ssr: true,
+        emitAssets: false,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: [ 'chrome107', 'edge107', 'firefox104', 'safari16' ],
+        cssMinify: 'esbuild'
+      },
+      plugins: [
+        {
+          name: 'vite:watch-package-data',
+          buildStart: [Function: buildStart],
+          buildEnd: [Function: buildEnd],
+          watchChange: [Function: watchChange]
+        },
+        {
+          name: 'alias',
+          buildStart: [AsyncFunction: buildStart],
+          resolveId: [Function: resolveId]
+        },
+        {
+          name: 'vite:react-babel',
+          enforce: 'pre',
+          config: [Function: config],
+          configResolved: [Function: configResolved],
+          options: [Function: options],
+          transform: {
+            filter: {
+              id: {
+                include: /\.[tj]sx?(?:\?.*)?$/,
+                exclude: /\/node_modules\//
+              }
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:react-refresh',
+          enforce: 'pre',
+          config: [Function: config],
+          resolveId: {
+            filter: { id: /^\/@react\-refresh$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^\/@react\-refresh$/ },
+            handler: [Function: handler]
+          },
+          transformIndexHtml: [Function: transformIndexHtml]
+        },
+        {
+          name: 'vite:modulepreload-polyfill',
+          resolveId: {
+            filter: { id: /^vite\/modulepreload\-polyfill$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^ vite\/modulepreload\-polyfill\.js$/ },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:resolve',
+          resolveId: {
+            filter: { id: { exclude: /^(?:\0|\/?virtual:)/ } },
+            handler: [AsyncFunction: handler]
+          },
+          load: {
+            filter: {
+              id: [
+                /^__vite\-browser\-external/,
+                /^__vite\-optional\-peer\-dep/
+              ]
+            },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:html-inline-proxy',
+          resolveId: {
+            filter: { id: /[?&]html-proxy\b/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /[?&]html-proxy\b/ },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:css',
+          buildStart: [Function: buildStart],
+          buildEnd: [Function: buildEnd],
+          load: {
+            filter: {
+              id: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/
+            },
+            handler: [AsyncFunction: handler]
+          },
+          transform: {
+            filter: {
+              id: {
+                include: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/,
+                exclude: [
+                  /[?&]commonjs-proxy/,
+                  /[?&](?:worker|sharedworker|raw|url)\b/
+                ]
+              }
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:esbuild',
+          configureServer: [Function: configureServer],
+          transform: [AsyncFunction: transform]
+        },
+        {
+          name: 'vite:json',
+          transform: {
+            filter: {
+              id: {
+                include: /\.json(?:$|\?)(?!commonjs-(?:proxy|external))/,
+                exclude: /[?&](?:worker|sharedworker|raw|url)\b/
+              }
+            },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:wasm-helper',
+          resolveId: {
+            filter: { id: /^ vite\/wasm\-helper\.js$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: {
+              id: [
+                /^ vite\/wasm\-helper\.js$/,
+                /(?<![?#].*)\.wasm\?init/
+              ]
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:worker',
+          buildStart: [Function: buildStart],
+          load: {
+            filter: { id: /(?:\?|&)(worker|sharedworker)(?:&|$)/ },
+            handler: [AsyncFunction: handler]
+          },
+          transform: {
+            filter: { id: /(?:\?|&)worker_file&type=(\w+)(?:&|$)/ },
+            handler: [AsyncFunction: handler]
+          },
+          renderChunk: [Function: renderChunk],
+          generateBundle: [Function: generateBundle],
+          watchChange: [Function: watchChange]
+        },
+        {
+          name: 'vite:asset',
+          perEnvironmentStartEndDuringDev: true,
+          buildStart: [Function: buildStart],
+          resolveId: { handler: [Function: handler] },
+          load: {
+            filter: { id: { exclude: /^\0/ } },
+            handler: [AsyncFunction: handler]
+          },
+          renderChunk: [Function: renderChunk],
+          generateBundle: [Function: generateBundle]
+        },
+        {
+          name: 'vite:react-virtual-preamble',
+          resolveId: {
+            order: 'pre',
+            filter: { id: /^@vitejs\/plugin\-react\/preamble$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^ @vitejs\/plugin\-react\/preamble$/ },
+            handler: [Function: handler]
+          }
+        },
+        {
+          name: 'vite:wasm-fallback',
+          load: { filter: { id: /\.wasm$/ }, handler: [Function: handler] }
+        },
+        {
+          name: 'vite:define',
+          transform: { handler: [AsyncFunction: handler] }
+        },
+        {
+          name: 'vite:css-post',
+          renderStart: [Function: renderStart],
+          transform: {
+            filter: {
+              id: {
+                include: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/,
+                exclude: [
+                  /[?&]commonjs-proxy/,
+                  /[?&](?:worker|sharedworker|raw|url)\b/
+                ]
+              }
+            },
+            handler: [AsyncFunction: handler]
+          },
+          renderChunk: [AsyncFunction: renderChunk],
+          augmentChunkHash: [Function: augmentChunkHash],
+          generateBundle: [AsyncFunction: generateBundle]
+        },
+        {
+          name: 'vite:dynamic-import-vars',
+          resolveId: {
+            filter: { id: /^ vite\/dynamic\-import\-helper\.js$/ },
+            handler: [Function: handler]
+          },
+          load: {
+            filter: { id: /^ vite\/dynamic\-import\-helper\.js$/ },
+            handler: [Function: handler]
+          },
+          transform: {
+            filter: {
+              id: {
+                exclude: /^\/Users\/serik08\/Documents\/GitHub\/dracarys\/dracarys\-store\/node_modules\/vite\/dist\/client\/client\.mjs$/
+              },
+              code: /\bimport\s*[(/]/
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:import-glob',
+          buildStart: [Function: buildStart],
+          transform: {
+            filter: { code: 'import.meta.glob' },
+            handler: [AsyncFunction: handler]
+          },
+          hotUpdate: [Function: hotUpdate]
+        },
+        {
+          name: 'vite:client-inject',
+          buildStart: [AsyncFunction: buildStart],
+          transform: [AsyncFunction: transform]
+        },
+        {
+          name: 'vite:css-analysis',
+          transform: {
+            filter: {
+              id: {
+                include: /\.(css|less|sass|scss|styl|stylus|pcss|postcss|sss)(?:$|\?)/,
+                exclude: [
+                  /[?&]commonjs-proxy/,
+                  /[?&](?:worker|sharedworker|raw|url)\b/
+                ]
+              }
+            },
+            handler: [AsyncFunction: handler]
+          }
+        },
+        {
+          name: 'vite:import-analysis',
+          transform: [AsyncFunction: transform]
+        }
+      ]
+    }
+  },
+  resolve: {
+    externalConditions: [ 'node', 'module-sync' ],
+    extensions: [
+      '.mjs',  '.js',
+      '.mts',  '.ts',
+      '.jsx',  '.tsx',
+      '.json'
+    ],
+    dedupe: [],
+    noExternal: [],
+    external: [],
+    preserveSymlinks: false,
+    alias: [
+      {
+        find: /^\/?@vite\/env/,
+        replacement: '/@fs/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/env.mjs'
+      },
+      {
+        find: /^\/?@vite\/client/,
+        replacement: '/@fs/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/client.mjs'
+      }
+    ],
+    mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+    conditions: [ 'module', 'browser', 'development|production' ],
+    builtins: []
+  },
+  configFile: '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/vite.config.ts',
+  configFileDependencies: [
+    '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/vite.config.ts'
+  ],
+  inlineConfig: {
+    root: undefined,
+    base: undefined,
+    mode: undefined,
+    configFile: undefined,
+    configLoader: undefined,
+    logLevel: undefined,
+    clearScreen: undefined,
+    server: { host: undefined },
+    forceOptimizeDeps: undefined
+  },
+  root: '/Users/serik08/Documents/GitHub/dracarys/dracarys-store',
+  base: '/',
+  decodedBase: '/',
+  rawBase: '/',
+  publicDir: '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/public',
+  cacheDir: '/Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite',
+  command: 'serve',
+  mode: 'development',
+  isWorker: false,
+  mainConfig: null,
+  bundleChain: [],
+  isProduction: false,
+  css: {
+    transformer: 'postcss',
+    preprocessorMaxWorkers: true,
+    devSourcemap: false
+  },
+  json: { namedExports: true, stringify: 'auto' },
+  builder: undefined,
+  preview: {
+    port: 4173,
+    strictPort: false,
+    host: true,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {}
+  },
+  envDir: '/Users/serik08/Documents/GitHub/dracarys/dracarys-store',
+  env: {
+    VITE_SUPABASE_URL: 'https://cziduzwylkdxeuywwsiw.supabase.co',
+    VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6aWR1end5bGtkeGV1eXd3c2l3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMjIxMDIsImV4cCI6MjA4NDc5ODEwMn0.TdUHaLaVdtFb2YYZ5Xyiwe8NyQ0Njz88hqYmZwTsgpA',
+    BASE_URL: '/',
+    MODE: 'development',
+    DEV: true,
+    PROD: false
+  },
+  assetsInclude: [Function: assetsInclude],
+  logger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  packageCache: Map(1) {
+    'fnpd_/Users/serik08/Documents/GitHub/dracarys/dracarys-store' => {
+      dir: '/Users/serik08/Documents/GitHub/dracarys/dracarys-store',
+      data: {
+        name: 'dracarys-store',
+        private: true,
+        version: '0.0.0',
+        type: 'module',
+        scripts: {
+          dev: 'vite',
+          build: 'tsc -b && vite build',
+          lint: 'eslint .',
+          preview: 'vite preview'
+        },
+        dependencies: {
+          '@supabase/supabase-js': '^2.78.0',
+          'lucide-react': '^0.563.0',
+          react: '^19.2.0',
+          'react-dom': '^19.2.0',
+          'react-helmet-async': '^2.0.5',
+          'react-router-dom': '^6.30.3',
+          xlsx: '^0.18.5',
+          zustand: '^5.0.10'
+        },
+        devDependencies: {
+          '@eslint/js': '^9.39.1',
+          '@tailwindcss/postcss': '^4.1.18',
+          '@types/node': '^24.10.1',
+          '@types/react': '^19.2.5',
+          '@types/react-dom': '^19.2.3',
+          '@vitejs/plugin-react': '^5.1.1',
+          autoprefixer: '^10.4.23',
+          eslint: '^9.39.1',
+          'eslint-plugin-react-hooks': '^7.0.1',
+          'eslint-plugin-react-refresh': '^0.4.24',
+          globals: '^16.5.0',
+          postcss: '^8.5.6',
+          tailwindcss: '^4.1.18',
+          typescript: '~5.9.3',
+          'typescript-eslint': '^8.46.4',
+          vite: '^7.2.4'
+        }
+      },
+      hasSideEffects: [Function: hasSideEffects],
+      setResolvedCache: [Function: setResolvedCache],
+      getResolvedCache: [Function: getResolvedCache]
+    },
+    set: [Function (anonymous)]
+  },
+  worker: { format: 'iife', plugins: '() => plugins', rollupOptions: {} },
+  appType: 'spa',
+  experimental: {
+    importGlobRestoreExtension: false,
+    renderBuiltUrl: undefined,
+    hmrPartialAccept: false
+  },
+  future: undefined,
+  ssr: {
+    target: 'node',
+    optimizeDeps: {
+      esbuildOptions: { preserveSymlinks: false },
+      include: [],
+      exclude: [],
+      needsInterop: [],
+      extensions: [],
+      holdUntilCrawlEnd: true,
+      force: false,
+      ignoreOutdatedRequests: false,
+      noDiscovery: true
+    },
+    external: [],
+    noExternal: [],
+    resolve: {
+      conditions: [ 'module', 'node', 'development|production' ],
+      externalConditions: [ 'node', 'module-sync' ]
+    }
+  },
+  dev: {
+    warmup: [],
+    sourcemap: { js: true },
+    sourcemapIgnoreList: [Function: isInNodeModules],
+    preTransformRequests: false,
+    createEnvironment: [Function: defaultCreateDevEnvironment],
+    recoverable: false,
+    moduleRunnerTransform: false
+  },
+  webSocketToken: 'guYEBrzsR41X',
+  getSortedPlugins: [Function: getSortedPlugins],
+  getSortedPluginHooks: [Function: getSortedPluginHooks],
+  createResolver: [Function: createResolver],
+  fsDenyGlob: [Function: arrayMatcher],
+  safeModulePaths: Set(0) {},
+  [Symbol(vite:resolved-config)]: true
+}
+2026-02-04T10:43:53.951Z vite:deps (client) Hash is consistent. Skipping. Use --force to override.
+
+  VITE v7.3.1  ready in 242 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://10.202.21.13:5173/
+  ➜  press h + enter to show help
+2026-02-04T10:43:54.438Z vite:html-fallback Rewriting GET / to /index.html
+2026-02-04T10:43:54.456Z vite:time 21.86ms /index.html
+2026-02-04T10:43:54.456Z vite:resolve 2.67ms /src/main.tsx -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/main.tsx
+2026-02-04T10:43:54.458Z vite:load 1.27ms [fs] /src/main.tsx
+2026-02-04T10:43:54.640Z vite:resolve 0.34ms /@vite/client -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/client.mjs
+2026-02-04T10:43:54.641Z vite:load 0.34ms [plugin] /@react-refresh
+2026-02-04T10:43:54.646Z vite:import-analysis 0.94ms [0 imports rewritten] /@react-refresh
+2026-02-04T10:43:54.646Z vite:transform 4.75ms /@react-refresh
+2026-02-04T10:43:54.646Z vite:time 5.47ms /@react-refresh
+2026-02-04T10:43:54.647Z vite:load 7.19ms [fs] /@vite/client
+2026-02-04T10:43:54.649Z vite:resolve 0.12ms @vite/env -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:54.649Z vite:import-analysis 1.13ms [1 imports rewritten] node_modules/vite/dist/client/client.mjs
+2026-02-04T10:43:54.649Z vite:transform 1.55ms /@vite/client
+2026-02-04T10:43:54.656Z vite:time 16.95ms /@vite/client
+2026-02-04T10:43:54.660Z vite:load 11.44ms [fs] /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:54.661Z vite:import-analysis 0.04ms [no imports] node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:54.661Z vite:transform 0.17ms /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:54.662Z vite:cache [304] /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:54.662Z vite:time 0.10ms /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:54.666Z vite:resolve 0.49ms ./index.css -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/index.css
+2026-02-04T10:43:54.666Z vite:resolve 0.57ms ./App.tsx -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/App.tsx
+2026-02-04T10:43:54.666Z vite:resolve 0.64ms react/jsx-dev-runtime -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.666Z vite:resolve 0.68ms react -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.666Z vite:resolve 0.72ms react-dom/client -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react-dom_client.js?v=145311db
+2026-02-04T10:43:54.666Z vite:resolve 0.72ms react-helmet-async -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react-helmet-async.js?v=145311db
+2026-02-04T10:43:54.667Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.670Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.670Z vite:import-analysis /node_modules/.vite/deps/react-dom_client.js?v=145311db needs interop
+2026-02-04T10:43:54.671Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react_jsx-dev-runtime.js
+2026-02-04T10:43:54.671Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react.js
+2026-02-04T10:43:54.671Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react-dom_client.js
+2026-02-04T10:43:54.671Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react-helmet-async.js
+2026-02-04T10:43:54.671Z vite:import-analysis 5.78ms [6 imports rewritten] src/main.tsx
+2026-02-04T10:43:54.672Z vite:transform 213.65ms /src/main.tsx
+2026-02-04T10:43:54.672Z vite:time 31.78ms /src/main.tsx
+2026-02-04T10:43:54.683Z vite:load 12.37ms [plugin] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.683Z vite:resolve 0.14ms ./chunk-BXEBRY3I.js -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:54.683Z vite:resolve 0.17ms ./chunk-V4OQ3NZ2.js -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:54.684Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-BXEBRY3I.js
+2026-02-04T10:43:54.684Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-V4OQ3NZ2.js
+2026-02-04T10:43:54.684Z vite:import-analysis 0.68ms [2 imports rewritten] node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.684Z vite:transform 0.78ms /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.684Z vite:load 13.32ms [plugin] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.684Z vite:import-analysis 0.22ms [2 imports rewritten] node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.684Z vite:transform 0.30ms /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.684Z vite:load 13.74ms [fs] /src/App.tsx
+2026-02-04T10:43:54.745Z vite:load 74.42ms [plugin] /node_modules/.vite/deps/react-helmet-async.js?v=145311db
+2026-02-04T10:43:54.747Z vite:import-analysis 1.43ms [2 imports rewritten] node_modules/.vite/deps/react-helmet-async.js?v=145311db
+2026-02-04T10:43:54.748Z vite:transform 2.35ms /node_modules/.vite/deps/react-helmet-async.js?v=145311db
+2026-02-04T10:43:54.748Z vite:load 77.51ms [fs] /src/index.css
+2026-02-04T10:43:54.753Z vite:load 81.97ms [plugin] /node_modules/.vite/deps/react-dom_client.js?v=145311db
+2026-02-04T10:43:54.777Z vite:resolve 0.30ms ./chunk-PBX5ABKV.js -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-PBX5ABKV.js?v=145311db
+2026-02-04T10:43:54.780Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-PBX5ABKV.js
+2026-02-04T10:43:54.780Z vite:import-analysis 19.38ms [3 imports rewritten] node_modules/.vite/deps/react-dom_client.js?v=145311db
+2026-02-04T10:43:54.780Z vite:transform 27.13ms /node_modules/.vite/deps/react-dom_client.js?v=145311db
+2026-02-04T10:43:54.788Z vite:resolve 1.70ms ./components/Header -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/Header.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.75ms ./components/Footer -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/Footer.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.77ms ./components/Cart -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/Cart.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.78ms ./components/ui/Toast -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Toast.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.78ms ./store/toastStore -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/store/toastStore.ts
+2026-02-04T10:43:54.788Z vite:resolve 1.79ms ./components/ui/LoadingSpinner -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.80ms ./components/ScrollToTop -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.81ms ./pages/Home -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/Home.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.81ms ./pages/Products -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/Products.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.82ms ./pages/ProductDetail -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/ProductDetail.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.82ms ./pages/Admin -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/Admin.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.82ms ./pages/AdminAuth -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/AdminAuth.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.83ms ./pages/info/Help -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/info/Help.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.83ms ./pages/info/Shipping -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/info/Shipping.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.83ms ./pages/info/Returns -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/info/Returns.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.83ms ./pages/info/Privacy -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/info/Privacy.tsx
+2026-02-04T10:43:54.788Z vite:resolve 1.83ms ./pages/info/Terms -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/info/Terms.tsx
+2026-02-04T10:43:54.788Z vite:resolve 2.02ms react-router-dom -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:54.788Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:54.788Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.788Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.789Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.789Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.789Z vite:hmr [self-accepts] src/App.tsx
+2026-02-04T10:43:54.789Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/react-router-dom.js
+2026-02-04T10:43:54.789Z vite:import-analysis 3.12ms [21 imports rewritten] src/App.tsx
+2026-02-04T10:43:54.866Z vite:transform 181.53ms /src/App.tsx
+2026-02-04T10:43:54.867Z vite:time 184.19ms /src/App.tsx
+2026-02-04T10:43:54.870Z vite:load 186.29ms [plugin] /node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:54.871Z vite:import-analysis 0.44ms [1 imports rewritten] node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:54.871Z vite:transform 0.73ms /node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:54.871Z vite:load 187.20ms [plugin] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:54.871Z vite:import-analysis 0.02ms [no imports] node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:54.871Z vite:transform 0.08ms [skipped] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:54.871Z vite:load 91.59ms [plugin] /node_modules/.vite/deps/chunk-PBX5ABKV.js?v=145311db
+2026-02-04T10:43:54.871Z vite:cache [memory] /node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:54.871Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:54.871Z vite:import-analysis 0.22ms [2 imports rewritten] node_modules/.vite/deps/chunk-PBX5ABKV.js?v=145311db
+2026-02-04T10:43:54.871Z vite:transform 0.30ms /node_modules/.vite/deps/chunk-PBX5ABKV.js?v=145311db
+2026-02-04T10:43:54.871Z vite:load 82.64ms [plugin] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:54.894Z vite:cache [memory] /node_modules/.vite/deps/chunk-PBX5ABKV.js?v=145311db
+2026-02-04T10:43:54.894Z vite:cache [memory] /node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:54.894Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:54.894Z vite:import-analysis 9.43ms [3 imports rewritten] node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:54.894Z vite:transform 22.52ms /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:54.895Z vite:load 106.27ms [fs] /src/components/Cart.tsx
+2026-02-04T10:43:54.913Z vite:load 124.27ms [fs] /src/components/Header.tsx
+2026-02-04T10:43:54.924Z vite:load 134.80ms [fs] /src/components/Footer.tsx
+2026-02-04T10:43:54.928Z vite:load 139.04ms [fs] /src/components/ui/Toast.tsx
+2026-02-04T10:43:54.936Z vite:load 147.61ms [fs] /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.945Z vite:resolve 0.49ms ../store/cartStore -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/store/cartStore.ts
+2026-02-04T10:43:54.945Z vite:resolve 0.57ms ./ui/Button -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Button.tsx
+2026-02-04T10:43:54.945Z vite:resolve 0.59ms ../services/inventoryService -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/services/inventoryService.ts
+2026-02-04T10:43:54.945Z vite:resolve 0.63ms lucide-react -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:43:54.945Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:54.945Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.946Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.948Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.948Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.948Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.948Z vite:hmr [self-accepts] src/components/Cart.tsx
+2026-02-04T10:43:54.948Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/lucide-react.js
+2026-02-04T10:43:54.949Z vite:import-analysis 4.52ms [7 imports rewritten] src/components/Cart.tsx
+2026-02-04T10:43:54.950Z vite:transform 54.72ms /src/components/Cart.tsx
+2026-02-04T10:43:54.952Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:54.952Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.953Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:54.953Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.953Z vite:hmr [self-accepts] src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.953Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:54.953Z vite:hmr [self-accepts] src/components/Header.tsx
+2026-02-04T10:43:54.953Z vite:hmr [self-accepts] src/components/Footer.tsx
+2026-02-04T10:43:54.953Z vite:hmr [self-accepts] src/components/ui/Toast.tsx
+2026-02-04T10:43:54.953Z vite:import-analysis 1.36ms [3 imports rewritten] src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.953Z vite:import-analysis 1.37ms [6 imports rewritten] src/components/Header.tsx
+2026-02-04T10:43:54.953Z vite:import-analysis 1.39ms [5 imports rewritten] src/components/Footer.tsx
+2026-02-04T10:43:54.953Z vite:import-analysis 1.40ms [4 imports rewritten] src/components/ui/Toast.tsx
+2026-02-04T10:43:54.955Z vite:transform 18.49ms /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.955Z vite:transform 41.88ms /src/components/Header.tsx
+2026-02-04T10:43:54.955Z vite:transform 31.36ms /src/components/Footer.tsx
+2026-02-04T10:43:54.955Z vite:transform 27.11ms /src/components/ui/Toast.tsx
+2026-02-04T10:43:54.955Z vite:time 14.01ms /src/components/Header.tsx
+2026-02-04T10:43:54.955Z vite:time 12.16ms /src/components/Footer.tsx
+2026-02-04T10:43:54.956Z vite:load 166.81ms [fs] /src/store/toastStore.ts
+2026-02-04T10:43:54.956Z vite:load 166.96ms [fs] /src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.959Z vite:load 170.10ms [fs] /src/pages/Home.tsx
+2026-02-04T10:43:54.975Z vite:cache [304] /src/components/Cart.tsx
+2026-02-04T10:43:54.975Z vite:time 0.33ms /src/components/Cart.tsx
+2026-02-04T10:43:54.976Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:54.976Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:54.976Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:54.976Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:54.976Z vite:hmr [self-accepts] src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.976Z vite:import-analysis 0.67ms [3 imports rewritten] src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.977Z vite:transform 20.91ms /src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.979Z vite:cache [304] /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.980Z vite:time 1.20ms /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:54.980Z vite:cache [304] /src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.980Z vite:time 0.06ms /src/components/ScrollToTop.tsx
+2026-02-04T10:43:54.981Z vite:cache [304] /src/components/ui/Toast.tsx
+2026-02-04T10:43:54.981Z vite:time 0.05ms /src/components/ui/Toast.tsx
+2026-02-04T10:43:54.982Z vite:resolve 0.12ms zustand -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/zustand.js?v=145311db
+2026-02-04T10:43:54.982Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/zustand.js
+2026-02-04T10:43:54.982Z vite:import-analysis 0.41ms [1 imports rewritten] src/store/toastStore.ts
+2026-02-04T10:43:54.982Z vite:transform 26.46ms /src/store/toastStore.ts
+2026-02-04T10:43:54.982Z vite:time 0.84ms /src/store/toastStore.ts
+2026-02-04T10:43:54.982Z vite:load 33.98ms [fs] /src/services/inventoryService.ts
+2026-02-04T10:43:54.982Z vite:load 34.11ms [fs] /src/store/cartStore.ts
+2026-02-04T10:43:54.983Z vite:load 34.30ms [fs] /src/components/ui/Button.tsx
+2026-02-04T10:43:55.012Z vite:resolve 0.45ms tailwindcss -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/tailwindcss/index.css
+2026-02-04T10:43:55.013Z vite:resolve 0.67ms ../components/ProductCard -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ProductCard.tsx
+2026-02-04T10:43:55.013Z vite:resolve 0.69ms ../components/ui/Skeleton -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.013Z vite:resolve 0.70ms ../services/productService -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/services/productService.ts
+2026-02-04T10:43:55.013Z vite:resolve 0.71ms ../components/SEO -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/SEO.tsx
+2026-02-04T10:43:55.013Z vite:resolve 0.72ms ../photo/adam.png -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/photo/adam.png
+2026-02-04T10:43:55.013Z vite:resolve 0.73ms ../photo/crm.png -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/photo/crm.png
+2026-02-04T10:43:55.013Z vite:resolve 0.74ms ../photo/support.png -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/photo/support.png
+2026-02-04T10:43:55.013Z vite:resolve 0.76ms ../photo/securatiy.png -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/photo/securatiy.png
+2026-02-04T10:43:55.013Z vite:resolve 0.76ms zustand/middleware -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/zustand_middleware.js?v=145311db
+2026-02-04T10:43:55.013Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:55.013Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:55.014Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:55.014Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:55.014Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:55.014Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:55.014Z vite:hmr [self-accepts] src/pages/Home.tsx
+2026-02-04T10:43:55.014Z vite:import-analysis 1.58ms [14 imports rewritten] src/pages/Home.tsx
+2026-02-04T10:43:55.014Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/zustand_middleware.js
+2026-02-04T10:43:55.014Z vite:import-analysis 1.99ms [2 imports rewritten] src/store/cartStore.ts
+2026-02-04T10:43:55.015Z vite:transform 55.78ms /src/pages/Home.tsx
+2026-02-04T10:43:55.015Z vite:transform 32.50ms /src/store/cartStore.ts
+2026-02-04T10:43:55.015Z vite:load 1.20ms [plugin] /src/photo/adam.png
+2026-02-04T10:43:55.015Z vite:load 1.22ms [plugin] /src/photo/crm.png
+2026-02-04T10:43:55.015Z vite:load 1.24ms [plugin] /src/photo/support.png
+2026-02-04T10:43:55.015Z vite:load 1.25ms [plugin] /src/photo/securatiy.png
+2026-02-04T10:43:55.015Z vite:time 34.16ms /src/pages/Home.tsx
+2026-02-04T10:43:55.015Z vite:time 33.84ms /src/store/cartStore.ts
+2026-02-04T10:43:55.015Z vite:import-analysis 0.02ms [no imports] src/photo/adam.png
+2026-02-04T10:43:55.015Z vite:import-analysis 0.03ms [no imports] src/photo/crm.png
+2026-02-04T10:43:55.015Z vite:import-analysis 0.04ms [no imports] src/photo/support.png
+2026-02-04T10:43:55.015Z vite:import-analysis 0.05ms [no imports] src/photo/securatiy.png
+2026-02-04T10:43:55.015Z vite:transform 0.41ms [skipped] /src/photo/adam.png
+2026-02-04T10:43:55.015Z vite:transform 0.40ms [skipped] /src/photo/crm.png
+2026-02-04T10:43:55.015Z vite:transform 0.39ms [skipped] /src/photo/support.png
+2026-02-04T10:43:55.015Z vite:transform 0.39ms [skipped] /src/photo/securatiy.png
+2026-02-04T10:43:55.016Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:55.016Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:55.016Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:55.016Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:55.016Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:55.016Z vite:hmr [self-accepts] src/components/ui/Button.tsx
+2026-02-04T10:43:55.016Z vite:import-analysis 0.35ms [3 imports rewritten] src/components/ui/Button.tsx
+2026-02-04T10:43:55.016Z vite:transform 33.43ms /src/components/ui/Button.tsx
+2026-02-04T10:43:55.016Z vite:time 34.66ms /src/components/ui/Button.tsx
+2026-02-04T10:43:55.016Z vite:load 68.09ms [plugin] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:43:55.026Z vite:cache [memory] /node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:55.026Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:55.026Z vite:import-analysis 7.20ms [2 imports rewritten] node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:43:55.026Z vite:transform 9.20ms /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:43:55.027Z vite:resolve 0.13ms ../lib/supabase -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/lib/supabase.ts
+2026-02-04T10:43:55.027Z vite:import-analysis 0.27ms [1 imports rewritten] src/services/inventoryService.ts
+2026-02-04T10:43:55.027Z vite:transform 44.54ms /src/services/inventoryService.ts
+2026-02-04T10:43:55.027Z vite:time 10.71ms /src/services/inventoryService.ts
+2026-02-04T10:43:55.027Z vite:load 45.41ms [plugin] /node_modules/.vite/deps/zustand.js?v=145311db
+2026-02-04T10:43:55.028Z vite:cache [memory] /node_modules/.vite/deps/chunk-BXEBRY3I.js?v=145311db
+2026-02-04T10:43:55.028Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:55.028Z vite:import-analysis 0.12ms [2 imports rewritten] node_modules/.vite/deps/zustand.js?v=145311db
+2026-02-04T10:43:55.028Z vite:transform 0.16ms /node_modules/.vite/deps/zustand.js?v=145311db
+2026-02-04T10:43:55.028Z vite:load 13.88ms [fs] /src/components/ProductCard.tsx
+2026-02-04T10:43:55.144Z vite:hmr [self-accepts] src/index.css
+2026-02-04T10:43:55.144Z vite:import-analysis 0.38ms [0 imports rewritten] src/index.css
+2026-02-04T10:43:55.144Z vite:transform 395.59ms /src/index.css
+2026-02-04T10:43:55.144Z vite:time 463.48ms /src/index.css
+2026-02-04T10:43:55.145Z vite:load 130.83ms [fs] /src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.148Z vite:cache [memory] /src/photo/adam.png
+2026-02-04T10:43:55.148Z vite:time 0.36ms /src/photo/adam.png?import
+2026-02-04T10:43:55.148Z vite:load 134.23ms [plugin] /node_modules/.vite/deps/zustand_middleware.js?v=145311db
+2026-02-04T10:43:55.149Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:55.149Z vite:import-analysis 0.55ms [1 imports rewritten] node_modules/.vite/deps/zustand_middleware.js?v=145311db
+2026-02-04T10:43:55.149Z vite:transform 1.12ms /node_modules/.vite/deps/zustand_middleware.js?v=145311db
+2026-02-04T10:43:55.150Z vite:load 136.00ms [fs] /src/components/SEO.tsx
+2026-02-04T10:43:55.154Z vite:load 140.28ms [fs] /src/services/productService.ts
+2026-02-04T10:43:55.158Z vite:resolve 2.67ms ../store/toastStore -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/store/toastStore.ts
+2026-02-04T10:43:55.158Z vite:resolve 2.80ms ./ui/Skeleton -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.158Z vite:resolve 2.83ms ../utils/formatters -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/utils/formatters.ts
+2026-02-04T10:43:55.159Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:55.160Z vite:cache [memory] /src/store/cartStore.ts
+2026-02-04T10:43:55.160Z vite:cache [memory] /src/store/toastStore.ts
+2026-02-04T10:43:55.160Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:55.160Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:55.160Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:55.160Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:55.160Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:55.160Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:55.160Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:55.160Z vite:hmr [self-accepts] src/components/ProductCard.tsx
+2026-02-04T10:43:55.161Z vite:hmr [self-accepts] src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.161Z vite:import-analysis 5.70ms [8 imports rewritten] src/components/ProductCard.tsx
+2026-02-04T10:43:55.161Z vite:import-analysis 5.71ms [3 imports rewritten] src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.161Z vite:transform 133.49ms /src/components/ProductCard.tsx
+2026-02-04T10:43:55.161Z vite:transform 16.56ms /src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.162Z vite:time 134.33ms /src/components/ProductCard.tsx
+2026-02-04T10:43:55.162Z vite:time 134.96ms /src/components/ui/Skeleton.tsx
+2026-02-04T10:43:55.163Z vite:cache [memory] /src/photo/crm.png
+2026-02-04T10:43:55.163Z vite:time 0.11ms /src/photo/crm.png?import
+2026-02-04T10:43:55.163Z vite:cache [memory] /src/photo/support.png
+2026-02-04T10:43:55.163Z vite:time 0.05ms /src/photo/support.png?import
+2026-02-04T10:43:55.164Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:55.164Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:55.164Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:55.164Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:55.164Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:55.164Z vite:cache [memory] /node_modules/.vite/deps/react-helmet-async.js?v=145311db
+2026-02-04T10:43:55.167Z vite:hmr [self-accepts] src/components/SEO.tsx
+2026-02-04T10:43:55.167Z vite:import-analysis 3.94ms [1 imports rewritten] src/services/productService.ts
+2026-02-04T10:43:55.167Z vite:import-analysis 3.98ms [4 imports rewritten] src/components/SEO.tsx
+2026-02-04T10:43:55.167Z vite:transform 12.99ms /src/services/productService.ts
+2026-02-04T10:43:55.167Z vite:transform 17.50ms /src/components/SEO.tsx
+2026-02-04T10:43:55.167Z vite:time 140.11ms /src/services/productService.ts
+2026-02-04T10:43:55.168Z vite:time 140.27ms /src/components/SEO.tsx
+2026-02-04T10:43:55.168Z vite:load 140.93ms [fs] /src/lib/supabase.ts
+2026-02-04T10:43:55.168Z vite:cache [memory] /src/photo/securatiy.png
+2026-02-04T10:43:55.168Z vite:time 0.14ms /src/photo/securatiy.png?import
+2026-02-04T10:43:55.170Z vite:load 8.90ms [fs] /src/utils/formatters.ts
+2026-02-04T10:43:55.170Z vite:resolve 0.17ms @supabase/supabase-js -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/@supabase_supabase-js.js?v=145311db
+2026-02-04T10:43:55.171Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/@supabase_supabase-js.js
+2026-02-04T10:43:55.171Z vite:import-analysis 0.89ms [1 imports rewritten] src/lib/supabase.ts
+2026-02-04T10:43:55.171Z vite:transform 3.29ms /src/lib/supabase.ts
+2026-02-04T10:43:55.171Z vite:time 2.82ms /src/lib/supabase.ts
+2026-02-04T10:43:55.172Z vite:import-analysis 0.03ms [no imports] src/utils/formatters.ts
+2026-02-04T10:43:55.172Z vite:transform 2.36ms /src/utils/formatters.ts
+2026-02-04T10:43:55.172Z vite:time 4.04ms /src/utils/formatters.ts
+2026-02-04T10:43:55.174Z vite:load 3.06ms [plugin] /node_modules/.vite/deps/@supabase_supabase-js.js?v=145311db
+2026-02-04T10:43:55.195Z vite:resolve 0.34ms ./chunk-5H4R2CZR.js -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-5H4R2CZR.js?v=145311db
+2026-02-04T10:43:55.195Z vite:resolve 0.45ms ./browser-EMB7CRMN.js -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/browser-EMB7CRMN.js?v=145311db
+2026-02-04T10:43:55.195Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:55.195Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/chunk-5H4R2CZR.js
+2026-02-04T10:43:55.195Z vite:import-analysis 7.31ms [3 imports rewritten] node_modules/.vite/deps/@supabase_supabase-js.js?v=145311db
+2026-02-04T10:43:55.195Z vite:transform 21.58ms /node_modules/.vite/deps/@supabase_supabase-js.js?v=145311db
+2026-02-04T10:43:55.197Z vite:load 1.60ms [plugin] /node_modules/.vite/deps/chunk-5H4R2CZR.js?v=145311db
+2026-02-04T10:43:55.197Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:43:55.197Z vite:import-analysis 0.18ms [1 imports rewritten] node_modules/.vite/deps/chunk-5H4R2CZR.js?v=145311db
+2026-02-04T10:43:55.197Z vite:transform 0.27ms /node_modules/.vite/deps/chunk-5H4R2CZR.js?v=145311db
+2026-02-04T10:43:55.253Z vite:time 0.55ms /photo/dracarys.png
+2026-02-04T10:43:55.260Z vite:time 0.52ms /src/photo/adam.png
+2026-02-04T10:43:55.260Z vite:time 0.12ms /src/photo/crm.png
+2026-02-04T10:43:55.261Z vite:time 0.10ms /src/photo/support.png
+2026-02-04T10:43:55.261Z vite:time 0.10ms /src/photo/securatiy.png
+2026-02-04T10:43:55.286Z vite:time 0.16ms /photo/drag.png
+2026-02-04T10:43:55.814Z vite:html-fallback Rewriting GET / to /index.html
+2026-02-04T10:43:55.822Z vite:cache [memory] /src/main.tsx
+2026-02-04T10:43:55.823Z vite:time 8.81ms /index.html
+2026-02-04T10:43:56.567Z vite:html-fallback Rewriting GET / to /index.html
+2026-02-04T10:43:56.570Z vite:cache [memory] /src/main.tsx
+2026-02-04T10:43:56.571Z vite:time 6.98ms /index.html
+2026-02-04T10:43:56.578Z vite:cache [304] /@react-refresh
+2026-02-04T10:43:56.578Z vite:time 0.18ms /@react-refresh
+2026-02-04T10:43:56.578Z vite:cache [memory] /@vite/client
+2026-02-04T10:43:56.588Z vite:time 10.46ms /@vite/client
+2026-02-04T10:43:56.592Z vite:cache [304] /src/main.tsx
+2026-02-04T10:43:56.592Z vite:time 0.15ms /src/main.tsx
+2026-02-04T10:43:56.592Z vite:cache [304] /src/App.tsx
+2026-02-04T10:43:56.592Z vite:time 0.05ms /src/App.tsx
+2026-02-04T10:43:56.592Z vite:cache [304] /src/index.css
+2026-02-04T10:43:56.592Z vite:time 0.21ms /src/index.css
+2026-02-04T10:43:56.593Z vite:cache [304] /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:56.593Z vite:time 0.10ms /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:43:56.593Z vite:cache [304] /src/components/Header.tsx
+2026-02-04T10:43:56.593Z vite:time 0.04ms /src/components/Header.tsx
+2026-02-04T10:43:56.594Z vite:cache [304] /src/components/ui/Toast.tsx
+2026-02-04T10:43:56.594Z vite:time 0.71ms /src/components/ui/Toast.tsx
+2026-02-04T10:43:56.595Z vite:cache [304] /src/store/toastStore.ts
+2026-02-04T10:43:56.595Z vite:time 0.22ms /src/store/toastStore.ts
+2026-02-04T10:43:56.597Z vite:cache [304] /src/components/Cart.tsx
+2026-02-04T10:43:56.597Z vite:time 1.34ms /src/components/Cart.tsx
+2026-02-04T10:43:56.598Z vite:cache [304] /src/pages/Home.tsx
+2026-02-04T10:43:56.598Z vite:time 0.06ms /src/pages/Home.tsx
+2026-02-04T10:43:56.598Z vite:cache [304] /src/store/cartStore.ts
+2026-02-04T10:43:56.598Z vite:time 0.04ms /src/store/cartStore.ts
+2026-02-04T10:43:56.598Z vite:cache [304] /src/components/ScrollToTop.tsx
+2026-02-04T10:43:56.598Z vite:time 0.03ms /src/components/ScrollToTop.tsx
+2026-02-04T10:43:56.598Z vite:cache [304] /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:56.598Z vite:time 0.08ms /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:43:56.598Z vite:cache [304] /src/components/Footer.tsx
+2026-02-04T10:43:56.598Z vite:time 0.02ms /src/components/Footer.tsx
+2026-02-04T10:43:56.599Z vite:cache [304] /src/components/ProductCard.tsx
+2026-02-04T10:43:56.599Z vite:time 0.24ms /src/components/ProductCard.tsx
+2026-02-04T10:43:56.599Z vite:cache [304] /src/components/ui/Button.tsx
+2026-02-04T10:43:56.599Z vite:time 0.05ms /src/components/ui/Button.tsx
+2026-02-04T10:43:56.600Z vite:cache [304] /src/services/inventoryService.ts
+2026-02-04T10:43:56.600Z vite:time 0.13ms /src/services/inventoryService.ts
+2026-02-04T10:43:56.600Z vite:cache [304] /src/components/SEO.tsx
+2026-02-04T10:43:56.600Z vite:time 0.15ms /src/components/SEO.tsx
+2026-02-04T10:43:56.600Z vite:cache [304] /src/services/productService.ts
+2026-02-04T10:43:56.600Z vite:time 0.12ms /src/services/productService.ts
+2026-02-04T10:43:56.600Z vite:cache [304] /src/components/ui/Skeleton.tsx
+2026-02-04T10:43:56.600Z vite:time 0.08ms /src/components/ui/Skeleton.tsx
+2026-02-04T10:43:56.601Z vite:cache [memory] /src/photo/adam.png
+2026-02-04T10:43:56.601Z vite:time 0.10ms /src/photo/adam.png?import
+2026-02-04T10:43:56.601Z vite:cache [memory] /src/photo/crm.png
+2026-02-04T10:43:56.601Z vite:time 0.05ms /src/photo/crm.png?import
+2026-02-04T10:43:56.601Z vite:cache [memory] /src/photo/support.png
+2026-02-04T10:43:56.601Z vite:time 0.04ms /src/photo/support.png?import
+2026-02-04T10:43:56.601Z vite:cache [memory] /src/photo/securatiy.png
+2026-02-04T10:43:56.601Z vite:time 0.08ms /src/photo/securatiy.png?import
+2026-02-04T10:43:56.602Z vite:cache [304] /src/lib/supabase.ts
+2026-02-04T10:43:56.602Z vite:time 0.04ms /src/lib/supabase.ts
+2026-02-04T10:43:56.603Z vite:cache [304] /src/utils/formatters.ts
+2026-02-04T10:43:56.603Z vite:time 0.11ms /src/utils/formatters.ts
+2026-02-04T10:43:56.606Z vite:time 0.41ms /photo/dracarys.png
+2026-02-04T10:43:56.607Z vite:time 0.46ms /photo/drag.png
+2026-02-04T10:43:56.607Z vite:time 0.49ms /src/photo/adam.png
+2026-02-04T10:43:56.608Z vite:time 0.14ms /src/photo/support.png
+2026-02-04T10:43:56.609Z vite:time 0.17ms /src/photo/crm.png
+2026-02-04T10:43:56.609Z vite:time 0.07ms /src/photo/securatiy.png
+2026-02-04T10:43:58.972Z vite:load 1.75ms [fs] /src/pages/Products.tsx
+2026-02-04T10:43:59.003Z vite:time 0.27ms /photo/drag.png
+2026-02-04T10:43:59.010Z vite:resolve 0.81ms ../components/ProductFilter -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ProductFilter.tsx
+2026-02-04T10:43:59.010Z vite:resolve 0.93ms ../components/SearchBar -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/SearchBar.tsx
+2026-02-04T10:43:59.010Z vite:resolve 0.94ms ../photo/drag.png -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/photo/drag.png
+2026-02-04T10:43:59.010Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:59.010Z vite:cache [memory] /src/components/ProductCard.tsx
+2026-02-04T10:43:59.010Z vite:cache [memory] /src/components/ui/Skeleton.tsx
+2026-02-04T10:43:59.010Z vite:cache [memory] /src/services/productService.ts
+2026-02-04T10:43:59.010Z vite:cache [memory] /src/store/toastStore.ts
+2026-02-04T10:43:59.010Z vite:cache [memory] /src/components/SEO.tsx
+2026-02-04T10:43:59.010Z vite:cache [memory] /src/services/inventoryService.ts
+2026-02-04T10:43:59.010Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:59.015Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:59.015Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:59.015Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:59.015Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:43:59.015Z vite:cache [memory] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:43:59.016Z vite:hmr [self-accepts] src/pages/Products.tsx
+2026-02-04T10:43:59.016Z vite:import-analysis 7.48ms [14 imports rewritten] src/pages/Products.tsx
+2026-02-04T10:43:59.016Z vite:transform 44.07ms /src/pages/Products.tsx
+2026-02-04T10:43:59.016Z vite:load 0.79ms [plugin] /src/photo/drag.png
+2026-02-04T10:43:59.017Z vite:time 48.22ms /src/pages/Products.tsx
+2026-02-04T10:43:59.017Z vite:import-analysis 0.01ms [no imports] src/photo/drag.png
+2026-02-04T10:43:59.017Z vite:transform 0.63ms [skipped] /src/photo/drag.png
+2026-02-04T10:43:59.017Z vite:load 1.81ms [fs] /src/components/ProductFilter.tsx
+2026-02-04T10:43:59.022Z vite:cache [memory] /src/photo/drag.png
+2026-02-04T10:43:59.023Z vite:time 0.22ms /src/photo/drag.png?import
+2026-02-04T10:43:59.023Z vite:load 7.10ms [fs] /src/components/SearchBar.tsx
+2026-02-04T10:43:59.026Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:59.026Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:59.026Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:59.026Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:59.026Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:59.026Z vite:hmr [self-accepts] src/components/ProductFilter.tsx
+2026-02-04T10:43:59.026Z vite:import-analysis 0.52ms [3 imports rewritten] src/components/ProductFilter.tsx
+2026-02-04T10:43:59.027Z vite:transform 9.30ms /src/components/ProductFilter.tsx
+2026-02-04T10:43:59.027Z vite:time 4.77ms /src/components/ProductFilter.tsx
+2026-02-04T10:43:59.028Z vite:cache [memory] /@react-refresh
+2026-02-04T10:43:59.028Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:43:59.028Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:43:59.028Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:43:59.028Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:43:59.028Z vite:cache [memory] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:43:59.028Z vite:hmr [self-accepts] src/components/SearchBar.tsx
+2026-02-04T10:43:59.028Z vite:import-analysis 0.68ms [4 imports rewritten] src/components/SearchBar.tsx
+2026-02-04T10:43:59.028Z vite:transform 5.35ms /src/components/SearchBar.tsx
+2026-02-04T10:43:59.028Z vite:time 5.99ms /src/components/SearchBar.tsx
+2026-02-04T10:43:59.059Z vite:time 4.29ms /src/photo/drag.png
+2026-02-04T10:44:03.311Z vite:time 2.46ms /photo/drag.png
+2026-02-04T10:44:16.560Z vite:html-fallback Rewriting GET /dracarys-admin to /index.html
+2026-02-04T10:44:16.576Z vite:cache [memory] /src/main.tsx
+2026-02-04T10:44:16.579Z vite:time 24.34ms /index.html
+2026-02-04T10:44:16.594Z vite:cache [memory] /@vite/client
+2026-02-04T10:44:16.594Z vite:time 0.26ms /@vite/client
+2026-02-04T10:44:16.594Z vite:cache [304] /src/main.tsx
+2026-02-04T10:44:16.594Z vite:time 0.09ms /src/main.tsx
+2026-02-04T10:44:16.608Z vite:cache [304] /@react-refresh
+2026-02-04T10:44:16.608Z vite:time 0.35ms /@react-refresh
+2026-02-04T10:44:16.608Z vite:cache [304] /src/index.css
+2026-02-04T10:44:16.608Z vite:time 0.15ms /src/index.css
+2026-02-04T10:44:16.609Z vite:cache [304] /src/App.tsx
+2026-02-04T10:44:16.609Z vite:time 0.04ms /src/App.tsx
+2026-02-04T10:44:16.609Z vite:cache [304] /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:44:16.609Z vite:time 0.05ms /node_modules/vite/dist/client/env.mjs
+2026-02-04T10:44:17.051Z vite:cache [304] /src/components/Header.tsx
+2026-02-04T10:44:17.051Z vite:time 0.26ms /src/components/Header.tsx
+2026-02-04T10:44:17.052Z vite:cache [304] /src/components/Footer.tsx
+2026-02-04T10:44:17.052Z vite:time 0.09ms /src/components/Footer.tsx
+2026-02-04T10:44:17.052Z vite:cache [304] /src/components/ScrollToTop.tsx
+2026-02-04T10:44:17.052Z vite:time 0.08ms /src/components/ScrollToTop.tsx
+2026-02-04T10:44:17.052Z vite:cache [304] /src/components/Cart.tsx
+2026-02-04T10:44:17.053Z vite:time 0.10ms /src/components/Cart.tsx
+2026-02-04T10:44:17.053Z vite:cache [304] /src/pages/Home.tsx
+2026-02-04T10:44:17.053Z vite:time 0.09ms /src/pages/Home.tsx
+2026-02-04T10:44:17.054Z vite:cache [304] /src/components/ui/Toast.tsx
+2026-02-04T10:44:17.054Z vite:time 0.15ms /src/components/ui/Toast.tsx
+2026-02-04T10:44:17.054Z vite:cache [304] /src/store/toastStore.ts
+2026-02-04T10:44:17.054Z vite:time 0.04ms /src/store/toastStore.ts
+2026-02-04T10:44:17.054Z vite:cache [304] /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:44:17.054Z vite:time 0.07ms /src/components/ui/LoadingSpinner.tsx
+2026-02-04T10:44:17.058Z vite:cache [304] /src/store/cartStore.ts
+2026-02-04T10:44:17.058Z vite:time 0.10ms /src/store/cartStore.ts
+2026-02-04T10:44:17.058Z vite:cache [304] /src/components/ui/Button.tsx
+2026-02-04T10:44:17.058Z vite:time 0.03ms /src/components/ui/Button.tsx
+2026-02-04T10:44:17.061Z vite:cache [304] /src/services/inventoryService.ts
+2026-02-04T10:44:17.061Z vite:time 0.08ms /src/services/inventoryService.ts
+2026-02-04T10:44:17.061Z vite:cache [304] /src/components/ProductCard.tsx
+2026-02-04T10:44:17.061Z vite:time 0.03ms /src/components/ProductCard.tsx
+2026-02-04T10:44:17.062Z vite:cache [304] /src/components/ui/Skeleton.tsx
+2026-02-04T10:44:17.062Z vite:time 0.18ms /src/components/ui/Skeleton.tsx
+2026-02-04T10:44:17.062Z vite:cache [304] /src/services/productService.ts
+2026-02-04T10:44:17.062Z vite:time 0.07ms /src/services/productService.ts
+2026-02-04T10:44:17.063Z vite:cache [304] /src/components/SEO.tsx
+2026-02-04T10:44:17.063Z vite:time 0.05ms /src/components/SEO.tsx
+2026-02-04T10:44:17.063Z vite:cache [memory] /src/photo/adam.png
+2026-02-04T10:44:17.063Z vite:time 0.17ms /src/photo/adam.png?import
+2026-02-04T10:44:17.064Z vite:cache [memory] /src/photo/crm.png
+2026-02-04T10:44:17.064Z vite:time 0.18ms /src/photo/crm.png?import
+2026-02-04T10:44:17.064Z vite:cache [memory] /src/photo/support.png
+2026-02-04T10:44:17.064Z vite:time 0.16ms /src/photo/support.png?import
+2026-02-04T10:44:17.065Z vite:cache [memory] /src/photo/securatiy.png
+2026-02-04T10:44:17.065Z vite:time 0.34ms /src/photo/securatiy.png?import
+2026-02-04T10:44:17.065Z vite:cache [304] /src/lib/supabase.ts
+2026-02-04T10:44:17.065Z vite:time 0.03ms /src/lib/supabase.ts
+2026-02-04T10:44:17.065Z vite:cache [304] /src/utils/formatters.ts
+2026-02-04T10:44:17.065Z vite:time 0.02ms /src/utils/formatters.ts
+2026-02-04T10:44:17.090Z vite:time 0.37ms /photo/dracarys.png
+2026-02-04T10:44:17.093Z vite:load 0.66ms [fs] /src/pages/AdminAuth.tsx
+2026-02-04T10:44:17.117Z vite:time 0.10ms /photo/drag.png
+2026-02-04T10:44:17.123Z vite:cache [memory] /@react-refresh
+2026-02-04T10:44:17.123Z vite:cache [memory] /src/components/SEO.tsx
+2026-02-04T10:44:17.123Z vite:cache [memory] /src/store/toastStore.ts
+2026-02-04T10:44:17.123Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:44:17.125Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:44:17.125Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:44:17.125Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:44:17.125Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:44:17.126Z vite:cache [memory] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:44:17.126Z vite:hmr [self-accepts] src/pages/AdminAuth.tsx
+2026-02-04T10:44:17.126Z vite:import-analysis 3.86ms [7 imports rewritten] src/pages/AdminAuth.tsx
+2026-02-04T10:44:17.127Z vite:transform 33.99ms /src/pages/AdminAuth.tsx
+2026-02-04T10:44:17.127Z vite:time 35.09ms /src/pages/AdminAuth.tsx
+2026-02-04T10:44:20.265Z vite:load 1.10ms [fs] /src/pages/Admin.tsx
+2026-02-04T10:44:20.335Z vite:resolve 0.67ms ../components/ui/Button -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Button.tsx
+2026-02-04T10:44:20.335Z vite:resolve 0.74ms ../components/ui/Input -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Input.tsx
+2026-02-04T10:44:20.335Z vite:resolve 0.76ms ../components/ui/Modal -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/components/ui/Modal.tsx
+2026-02-04T10:44:20.335Z vite:resolve 0.77ms ../services/purchaseService -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/services/purchaseService.ts
+2026-02-04T10:44:20.335Z vite:resolve 0.78ms ./AdminAI -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/pages/AdminAI.tsx
+2026-02-04T10:44:20.335Z vite:cache [memory] /@react-refresh
+2026-02-04T10:44:20.335Z vite:cache [memory] /src/components/ui/Button.tsx
+2026-02-04T10:44:20.335Z vite:cache [memory] /src/components/ui/Skeleton.tsx
+2026-02-04T10:44:20.336Z vite:cache [memory] /src/services/productService.ts
+2026-02-04T10:44:20.336Z vite:cache [memory] /src/store/toastStore.ts
+2026-02-04T10:44:20.336Z vite:cache [memory] /src/components/SEO.tsx
+2026-02-04T10:44:20.336Z vite:cache [memory] /src/utils/formatters.ts
+2026-02-04T10:44:20.336Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:44:20.336Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:44:20.336Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:44:20.336Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:44:20.336Z vite:cache [memory] /node_modules/.vite/deps/react-router-dom.js?v=145311db
+2026-02-04T10:44:20.336Z vite:cache [memory] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:44:20.336Z vite:hmr [self-accepts] src/pages/Admin.tsx
+2026-02-04T10:44:20.336Z vite:import-analysis 1.87ms [15 imports rewritten] src/pages/Admin.tsx
+2026-02-04T10:44:20.338Z vite:transform 72.68ms /src/pages/Admin.tsx
+2026-02-04T10:44:20.339Z vite:time 75.10ms /src/pages/Admin.tsx
+2026-02-04T10:44:20.342Z vite:load 6.08ms [fs] /src/components/ui/Modal.tsx
+2026-02-04T10:44:20.345Z vite:load 8.76ms [fs] /src/components/ui/Input.tsx
+2026-02-04T10:44:20.348Z vite:load 12.22ms [fs] /src/pages/AdminAI.tsx
+2026-02-04T10:44:20.413Z vite:load 77.08ms [fs] /src/services/purchaseService.ts
+2026-02-04T10:44:20.413Z vite:cache [memory] /@react-refresh
+2026-02-04T10:44:20.414Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:44:20.414Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:44:20.414Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:44:20.414Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:44:20.414Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:44:20.414Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:44:20.414Z vite:cache [memory] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:44:20.414Z vite:hmr [self-accepts] src/components/ui/Modal.tsx
+2026-02-04T10:44:20.414Z vite:hmr [self-accepts] src/components/ui/Input.tsx
+2026-02-04T10:44:20.414Z vite:import-analysis 0.61ms [4 imports rewritten] src/components/ui/Modal.tsx
+2026-02-04T10:44:20.414Z vite:import-analysis 0.62ms [3 imports rewritten] src/components/ui/Input.tsx
+2026-02-04T10:44:20.414Z vite:transform 72.11ms /src/components/ui/Modal.tsx
+2026-02-04T10:44:20.414Z vite:transform 69.50ms /src/components/ui/Input.tsx
+2026-02-04T10:44:20.414Z vite:time 1.54ms /src/components/ui/Modal.tsx
+2026-02-04T10:44:20.414Z vite:time 2.03ms /src/components/ui/Input.tsx
+2026-02-04T10:44:20.417Z vite:cache [memory] /src/lib/supabase.ts
+2026-02-04T10:44:20.417Z vite:import-analysis 0.34ms [1 imports rewritten] src/services/purchaseService.ts
+2026-02-04T10:44:20.417Z vite:transform 4.08ms /src/services/purchaseService.ts
+2026-02-04T10:44:20.417Z vite:time 4.36ms /src/services/purchaseService.ts
+2026-02-04T10:44:20.426Z vite:resolve 0.41ms ../services/salesService -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/src/services/salesService.ts
+2026-02-04T10:44:20.426Z vite:resolve 0.50ms xlsx -> /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/xlsx.js?v=145311db
+2026-02-04T10:44:20.426Z vite:cache [memory] /@react-refresh
+2026-02-04T10:44:20.427Z vite:cache [memory] /src/services/productService.ts
+2026-02-04T10:44:20.427Z vite:cache [memory] /src/services/purchaseService.ts
+2026-02-04T10:44:20.427Z vite:cache [memory] /src/utils/formatters.ts
+2026-02-04T10:44:20.427Z vite:cache [memory] /src/store/toastStore.ts
+2026-02-04T10:44:20.427Z vite:cache [memory] /src/components/ui/Modal.tsx
+2026-02-04T10:44:20.427Z vite:cache [memory] /src/components/ui/Button.tsx
+2026-02-04T10:44:20.427Z vite:import-analysis /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db needs interop
+2026-02-04T10:44:20.427Z vite:import-analysis /node_modules/.vite/deps/react.js?v=145311db needs interop
+2026-02-04T10:44:20.427Z vite:cache [memory] /node_modules/.vite/deps/react_jsx-dev-runtime.js?v=145311db
+2026-02-04T10:44:20.427Z vite:cache [memory] /node_modules/.vite/deps/react.js?v=145311db
+2026-02-04T10:44:20.427Z vite:cache [memory] /node_modules/.vite/deps/lucide-react.js?v=145311db
+2026-02-04T10:44:20.427Z vite:hmr [self-accepts] src/pages/AdminAI.tsx
+2026-02-04T10:44:20.427Z vite:optimize-deps load /Users/serik08/Documents/GitHub/dracarys/dracarys-store/node_modules/.vite/deps/xlsx.js
+2026-02-04T10:44:20.427Z vite:import-analysis 1.93ms [12 imports rewritten] src/pages/AdminAI.tsx
+2026-02-04T10:44:20.430Z vite:transform 81.54ms /src/pages/AdminAI.tsx
+2026-02-04T10:44:20.432Z vite:time 18.72ms /src/pages/AdminAI.tsx
+2026-02-04T10:44:20.433Z vite:load 6.01ms [fs] /src/services/salesService.ts
+2026-02-04T10:44:20.434Z vite:cache [memory] /src/lib/supabase.ts
+2026-02-04T10:44:20.434Z vite:import-analysis 0.27ms [1 imports rewritten] src/services/salesService.ts
+2026-02-04T10:44:20.434Z vite:transform 1.52ms /src/services/salesService.ts
+2026-02-04T10:44:20.435Z vite:load 7.97ms [plugin] /node_modules/.vite/deps/xlsx.js?v=145311db
+2026-02-04T10:44:20.445Z vite:cache [memory] /node_modules/.vite/deps/chunk-V4OQ3NZ2.js?v=145311db
+2026-02-04T10:44:20.445Z vite:import-analysis 8.25ms [1 imports rewritten] node_modules/.vite/deps/xlsx.js?v=145311db
+2026-02-04T10:44:20.445Z vite:transform 10.17ms /node_modules/.vite/deps/xlsx.js?v=145311db
+2026-02-04T10:44:20.447Z vite:cache [memory] /node_modules/.vite/deps/xlsx.js?v=145311db
+2026-02-04T10:44:20.448Z vite:time 0.99ms /node_modules/.vite/deps/xlsx.js?v=145311db
+2026-02-04T10:44:20.449Z vite:cache [memory] /src/services/salesService.ts
+2026-02-04T10:44:20.449Z vite:time 0.10ms /src/services/salesService.ts

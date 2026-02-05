@@ -1,0 +1,447 @@
+/* Mobile Responsive Styles for Home Page */
+
+/* Mobile: до 768px */
+@media (max-width: 768px) {
+  /* Header */
+  .home-header-container {
+    padding: 16px 20px !important;
+  }
+
+  .home-logo-container {
+    gap: 12px !important;
+  }
+
+  .home-logo {
+    height: 35px !important;
+  }
+
+  .home-logo-title {
+    font-size: 16px !important;
+  }
+
+  .home-logo-subtitle {
+    font-size: 11px !important;
+  }
+
+  /* Скрыть кнопки на мобильном */
+  .home-header-button-login,
+  .home-header-button-register {
+    display: none !important;
+  }
+
+  /* Показать три полоски на мобильном */
+  .home-mobile-menu-button {
+    display: flex !important;
+  }
+
+  /* Показать мобильное меню */
+  .home-mobile-menu {
+    display: flex !important;
+  }
+
+  /* Hero Section */
+  .home-hero-section {
+    padding-top: 70px !important;
+    padding-bottom: 60px !important;
+  }
+
+  .home-hero-container {
+    padding: 0 20px !important;
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  .home-hero-title {
+    font-size: 42px !important;
+    margin-bottom: 24px !important;
+    margin-top: -8px !important;
+    letter-spacing: -1.5px !important;
+  }
+
+  .home-hero-button {
+    padding: 16px 36px !important;
+    font-size: 16px !important;
+    margin-bottom: 48px !important;
+    width: 100%;
+  }
+
+  .home-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+    padding-top: 24px !important;
+  }
+
+  .home-stat-number {
+    font-size: 36px !important;
+    letter-spacing: -1px !important;
+  }
+
+  .home-stat-label {
+    font-size: 13px !important;
+  }
+
+  .home-card-container {
+    order: -1;
+  }
+
+  .home-card-image {
+    border-radius: 16px !important;
+  }
+
+  .home-card-overlay {
+    padding: 20px !important;
+  }
+
+  .home-card-number {
+    font-size: 14px !important;
+    letter-spacing: 1.5px !important;
+    padding-right: 10px !important;
+    margin-top: -3px !important;
+  }
+
+  .home-card-bonus-container {
+    padding-left: 4px !important;
+    margin-bottom: -18px !important;
+  }
+
+  .home-card-bonus-label {
+    font-size: 10px !important;
+  }
+
+  .home-card-bonus-value {
+    font-size: 24px !important;
+  }
+
+  /* Stats Section */
+  .home-stats-section {
+    padding: 60px 0 !important;
+  }
+
+  .home-stats-section-container {
+    padding: 0 20px !important;
+  }
+
+  .home-stats-section-title {
+    font-size: 36px !important;
+    margin-bottom: 40px !important;
+    letter-spacing: -1px !important;
+  }
+
+  .home-steps-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .home-step-card {
+    padding: 32px !important;
+    border-radius: 12px !important;
+  }
+
+  .home-step-number {
+    font-size: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .home-step-title {
+    font-size: 22px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .home-step-description {
+    font-size: 15px !important;
+  }
+
+  /* Benefits Section */
+  .home-benefits-section {
+    padding: 60px 0 !important;
+  }
+
+  .home-benefits-container {
+    padding: 0 20px !important;
+  }
+
+  .home-benefits-title {
+    font-size: 36px !important;
+    margin-bottom: 32px !important;
+    letter-spacing: -1px !important;
+    text-align: left !important;
+  }
+
+  .home-benefits-container > div {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .home-benefits-container > div > div:first-child {
+    order: 1;
+  }
+
+  .home-benefits-container > div > div:last-child {
+    order: 2;
+  }
+
+  .home-benefits-container p {
+    font-size: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .home-benefits-container button {
+    width: 100% !important;
+    padding: 16px 36px !important;
+    font-size: 16px !important;
+  }
+
+  .home-benefits-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+
+  .home-benefit-item {
+    padding: 32px 0 !important;
+  }
+
+  .home-benefit-title {
+    font-size: 24px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .home-benefit-description {
+    font-size: 16px !important;
+  }
+
+  /* CTA Section */
+  .home-cta-section {
+    padding: 60px 0 !important;
+  }
+
+  .home-cta-container {
+    padding: 0 20px !important;
+  }
+
+  .home-cta-title {
+    font-size: 36px !important;
+    margin-bottom: 20px !important;
+    letter-spacing: -1px !important;
+  }
+
+  .home-cta-description {
+    font-size: 16px !important;
+    margin-bottom: 32px !important;
+  }
+
+  .home-cta-button {
+    padding: 16px 36px !important;
+    font-size: 16px !important;
+    width: 100%;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: -40px !important;
+    padding: 50px 20px 35px !important;
+    border-radius: 60px 60px 0 0 !important;
+  }
+
+  footer > div:first-child {
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  footer > div:first-child > div:first-child {
+    grid-template-columns: 1fr !important;
+    gap: 35px !important;
+    margin-bottom: 35px !important;
+  }
+
+  footer > div:first-child > div:first-child > div:first-child > div:first-child {
+    font-size: 20px !important;
+    margin-bottom: 10px !important;
+  }
+
+  footer > div:first-child > div:first-child > div:first-child > div:last-child {
+    font-size: 14px !important;
+  }
+
+  footer > div:first-child > div:first-child > div > div:first-child {
+    font-size: 11px !important;
+    margin-bottom: 15px !important;
+  }
+
+  footer > div:first-child > div:first-child > div > div:not(:first-child),
+  footer > div:first-child > div:first-child > div > a {
+    font-size: 14px !important;
+    margin-bottom: 10px !important;
+  }
+
+  footer > div:first-child > div:last-child {
+    margin-top: 50px !important;
+    padding-top: 30px !important;
+    border-top: 2px solid rgba(0, 0, 0, 0.06) !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    font-size: 13px !important;
+  }
+
+  footer > div:first-child > div:last-child > div:last-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  /* Privacy & Terms Pages - мобильная версия */
+  .privacy-content-section {
+    padding-top: 100px !important;
+    padding-bottom: 60px !important;
+  }
+
+  .privacy-content-container {
+    padding: 0 20px !important;
+  }
+
+  .privacy-content-container > h1 {
+    font-size: 36px !important;
+    letter-spacing: -1px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .privacy-content-container > p {
+    font-size: 14px !important;
+    margin-bottom: 40px !important;
+  }
+
+  .privacy-content-container > div {
+    font-size: 16px !important;
+    gap: 32px !important;
+  }
+
+  .privacy-content-container > div > section > h2 {
+    font-size: 24px !important;
+    margin-bottom: 12px !important;
+    letter-spacing: -0.3px !important;
+  }
+
+  .privacy-content-container > div > section > p {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+  }
+
+  .privacy-content-container > div > section > ul {
+    font-size: 15px !important;
+    padding-left: 20px !important;
+    gap: 10px !important;
+    line-height: 1.6 !important;
+  }
+
+  .privacy-content-container > div > section > ul > li {
+    line-height: 1.6 !important;
+  }
+
+  .privacy-last-contact {
+    margin-bottom: 40px !important;
+  }
+
+  /* CardInfo.jsx - мобильная версия Hero Section */
+  .home-hero-container:has(.card-hero-text-wrapper) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 32px !important;
+  }
+
+  .card-hero-text-wrapper {
+    order: 1 !important;
+    display: contents !important;
+  }
+
+  .card-hero-title {
+    order: 1 !important;
+    margin-bottom: 24px !important;
+  }
+
+  .card-hero-image {
+    order: 2 !important;
+  }
+
+  .card-hero-button {
+    order: 3 !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+  }
+
+  .card-hero-text-wrapper .home-stats-grid {
+    order: 4 !important;
+  }
+
+  /* CardInfo.jsx - волнообразные края для мобильной версии */
+  .home-stats-section {
+    border-radius: 60px 60px 0 0 !important;
+    margin-top: -40px !important;
+  }
+
+  .home-benefits-section {
+    border-radius: 60px 60px 0 0 !important;
+    margin-top: -40px !important;
+  }
+
+  /* CardInfo.jsx - отступы после статистики и последней карточки */
+  .card-stats-grid {
+    margin-bottom: 40px !important;
+  }
+
+  .card-last-step {
+    margin-bottom: 40px !important;
+  }
+
+  /* Footer для Privacy & Terms - мобильная версия (использует тот же стиль что и Home) */
+}
+
+/* Tablet: 769px - 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .home-header-container {
+    padding: 20px 32px !important;
+  }
+
+  .home-hero-container {
+    padding: 0 32px !important;
+    gap: 60px !important;
+  }
+
+  .home-hero-title {
+    font-size: 56px !important;
+    letter-spacing: -2px !important;
+  }
+
+  .home-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .home-stats-section-container,
+  .home-benefits-container,
+  .home-cta-container {
+    padding: 0 32px !important;
+  }
+
+  .home-stats-section-title,
+  .home-benefits-title,
+  .home-cta-title {
+    font-size: 48px !important;
+  }
+
+  .home-steps-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}

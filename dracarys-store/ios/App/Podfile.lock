@@ -1,0 +1,34 @@
+PODS:
+  - Capacitor (8.0.2):
+    - CapacitorCordova
+  - CapacitorApp (8.0.0):
+    - Capacitor
+  - CapacitorCordova (8.0.2)
+  - CapacitorNativeBiometric (0.0.1):
+    - Capacitor
+
+DEPENDENCIES:
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - CapacitorNativeBiometric (from `../../node_modules/capacitor-native-biometric`)
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorApp:
+    :path: "../../node_modules/@capacitor/app"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorNativeBiometric:
+    :path: "../../node_modules/capacitor-native-biometric"
+
+SPEC CHECKSUMS:
+  Capacitor: 2b79172ad27f3be2d103cce88b8eb9803fdcc744
+  CapacitorApp: 3963a84197280757b84f126afd1520a85ae3b092
+  CapacitorCordova: 921bdb690ebe82421b24fce45552fd3dea2ae43a
+  CapacitorNativeBiometric: 78cf21304251a512e4597437325b5e9b0cd9f7b3
+
+PODFILE CHECKSUM: 28b5ee8ad0ba521bfcbe76c76e92091f6533dcb8
+
+COCOAPODS: 1.16.2
