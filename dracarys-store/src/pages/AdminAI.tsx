@@ -5,6 +5,7 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { salesService } from '../services/salesService';
 import { productService } from '../services/productService';
+import JsBarcode from 'jsbarcode';
 import { purchaseService } from '../services/purchaseService';
 import type { Sale, Product, Purchase } from '../types/database';
 import { formatPrice } from '../utils/formatters';
@@ -178,6 +179,7 @@ export const AdminAI: React.FC = () => {
         colors: [] as string[],
         images: [] as string[],
         sizes: [] as string[],
+        color_images: {} as Record<string, string[]>,
         stockQuantities: {} as Record<string, Record<string, string>> // color -> size -> qty
     });
 
@@ -598,6 +600,71 @@ export const AdminAI: React.FC = () => {
         setStockAdditions({});
     };
 
+    const handlePrintBarcode = (product: Product | null) => {
+        if (!product || !product.barcode) {
+            addToast('error', 'У товара нет штрихкода');
+            return;
+        }
+
+        try {
+            // Create a hidden canvas to generate the barcode
+            const canvas = document.createElement('canvas');
+            JsBarcode(canvas, product.barcode, {
+                format: "CODE128",
+                displayValue: true,
+                fontSize: 20,
+                margin: 0,
+                width: 2,
+                height: 50
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+
+            // Create PDF (58mm x 40mm)
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: [58, 40]
+            });
+
+            // Add Content
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Dracarys Store', 29, 5, { align: 'center' }); // Centered Header
+
+            // Product Name (Truncate if too long)
+            let name = product.name;
+            if (name.length > 20) name = name.substring(0, 18) + '...';
+            doc.setFontSize(10);
+            doc.text(name, 29, 10, { align: 'center' });
+
+            // Price (Big)
+            doc.setFontSize(16);
+            doc.text(`${product.price} T`, 29, 17, { align: 'center' });
+
+            // Size/Color info if selected
+            const info = `${selectedBarcodeColor !== 'Без цвета' ? selectedBarcodeColor : ''}`;
+            if (info) {
+                doc.setFontSize(8);
+                doc.text(info, 29, 21, { align: 'center' });
+            }
+
+            // Barcode Image
+            // x, y, w, h
+            // Center roughly: 58mm width. image width depends.
+            // Let's use 40mm width for barcode, centered -> x = (58-40)/2 = 9
+            doc.addImage(imgData, 'PNG', 9, 23, 40, 15);
+
+            // Save
+            doc.save(`${product.name}_barcode.pdf`);
+            addToast('success', 'Этикетка скачана');
+
+        } catch (error) {
+            console.error('Print Error:', error);
+            addToast('error', 'Ошибка печати');
+        }
+    };
+
     const handleCloseBarcodeModal = () => {
         setBarcodeModalOpen(false);
         setBarcodeModalInput('');
@@ -676,10 +743,23 @@ export const AdminAI: React.FC = () => {
             }
 
             if (isEditModalOpen) {
-                setEditForm(prev => ({
-                    ...prev,
-                    images: [...(prev.images || []), ...uploadedUrls]
-                }));
+                // Check if we are uploading for a specific color
+                const colorKey = selectedBarcodeColor && selectedBarcodeColor !== 'Без цвета' ? selectedBarcodeColor : null;
+
+                if (colorKey) {
+                    setEditForm(prev => ({
+                        ...prev,
+                        color_images: {
+                            ...prev.color_images,
+                            [colorKey]: [...(prev.color_images[colorKey] || []), ...uploadedUrls]
+                        }
+                    }));
+                } else {
+                    setEditForm(prev => ({
+                        ...prev,
+                        images: [...(prev.images || []), ...uploadedUrls]
+                    }));
+                }
             } else {
                 setNewProductForm(prev => ({
                     ...prev,
@@ -1139,6 +1219,7 @@ export const AdminAI: React.FC = () => {
             colors: product.colors || (product.color ? [product.color] : []),
             images: product.images || (product.image_url ? product.image_url.split(',') : []),
             sizes: product.sizes || [],
+            color_images: product.color_images || {},
             stockQuantities
         });
         setSelectedBarcodeColor(product.colors?.[0] || 'Без цвета');
@@ -1160,6 +1241,7 @@ export const AdminAI: React.FC = () => {
                 barcode: editForm.barcode,
                 colors: editForm.colors,
                 images: editForm.images,
+                color_images: editForm.color_images,
                 sizes: editForm.sizes
             });
 
@@ -1852,16 +1934,6 @@ ${JSON.stringify(context, null, 2)}
                                                     className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none"
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цвет</label>
-                                                <input
-                                                    type="text"
-                                                    value={newPurchase.color}
-                                                    onChange={(e) => setNewPurchase({ ...newPurchase, color: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-[16px] md:text-sm outline-none"
-                                                    placeholder="Напр. Черный"
-                                                />
-                                            </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div>
                                                     <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Цена закупки шт (₸)</label>
@@ -2152,13 +2224,38 @@ ${JSON.stringify(context, null, 2)}
                                                                                 {product?.barcode ? `BC: ${product.barcode}` : 'Без BC'}
                                                                             </p>
                                                                             {product && (
-                                                                                <button
-                                                                                    onClick={() => handleEditProduct(product)}
-                                                                                    className="p-1.5 hover:text-accent transition-colors"
-                                                                                    title="Редактировать товар"
-                                                                                >
-                                                                                    <Pencil className="w-3.5 h-3.5" />
-                                                                                </button>
+                                                                                <>
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            if (product) {
+                                                                                                if (product.barcode) {
+                                                                                                    setBarcodeModalInput(product.barcode);
+                                                                                                    setBarcodeModalProduct(product);
+                                                                                                    setBarcodeModalStep('found');
+                                                                                                    setSelectedBarcodeColor(product.colors?.[0] || product.color || 'Без цвета');
+                                                                                                    setBarcodeModalOpen(true);
+                                                                                                } else {
+                                                                                                    setBarcodeModalAssignProduct(product);
+                                                                                                    setBarcodeModalInput('');
+                                                                                                    setBarcodeModalStep('assign');
+                                                                                                    setSelectedBarcodeColor(product.colors?.[0] || product.color || 'Без цвета');
+                                                                                                    setBarcodeModalOpen(true);
+                                                                                                }
+                                                                                            }
+                                                                                        }}
+                                                                                        className="p-1.5 hover:text-accent transition-colors"
+                                                                                        title="Штрихкод / Ценник"
+                                                                                    >
+                                                                                        <Printer className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => handleEditProduct(product)}
+                                                                                        className="p-1.5 hover:text-accent transition-colors"
+                                                                                        title="Редактировать товар"
+                                                                                    >
+                                                                                        <Pencil className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                </>
                                                                             )}
                                                                         </div>
                                                                         <div className="flex items-center gap-2">
@@ -2938,8 +3035,15 @@ ${JSON.stringify(context, null, 2)}
                                         <p><span className="font-bold text-gray">Цена:</span> {formatPrice(barcodeModalProduct.price)} ₸</p>
                                         <p><span className="font-bold text-gray">Размеры:</span> {barcodeModalProduct.sizes?.join(', ') || 'Не указаны'}</p>
                                     </div>
-                                    <div className="mt-4">
-                                        <p className="text-xs text-gray italic">Товар уже существует в каталоге с этим штрихкодом.</p>
+                                    <div className="mt-4 flex gap-3">
+                                        <button
+                                            onClick={() => handlePrintBarcode(barcodeModalProduct)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-dark text-white rounded-apple text-xs font-bold uppercase tracking-wider hover:bg-accent transition-all shadow-sm"
+                                        >
+                                            <Printer className="w-4 h-4" />
+                                            Печать ценника
+                                        </button>
+                                        <p className="text-xs text-gray italic flex items-center">Товар найден в базе.</p>
                                     </div>
                                 </div>
 
@@ -3009,10 +3113,29 @@ ${JSON.stringify(context, null, 2)}
                         {/* Assign Barcode to Existing Product */}
                         {barcodeModalStep === 'assign' && barcodeModalAssignProduct && (
                             <div className="space-y-6 animate-scale-in">
-                                <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-apple-lg">
-                                    <p className="text-xs font-black uppercase tracking-widest text-blue-700 mb-2">Присвоить штрихкод</p>
-                                    <p className="text-sm text-blue-900 font-bold mb-1">Товар: {barcodeModalAssignProduct.name}</p>
-                                    <p className="text-xs text-blue-700">Придумайте и введите штрихкод для этого товара выше.</p>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-widest text-blue-700 mb-2">Присвоить штрихкод</p>
+                                        <p className="text-sm text-blue-900 font-bold mb-1">Товар: {barcodeModalAssignProduct.name}</p>
+                                        <p className="text-xs text-blue-700">Придумайте и введите штрихкод для этого товара выше.</p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            // Create a temporary product with the current input as barcode to preview print
+                                            // Or just print the assigned product if it had one? No, it doesn't have one yet.
+                                            // User entered barcode in input.
+                                            if (barcodeModalInput) {
+                                                handlePrintBarcode({ ...barcodeModalAssignProduct, barcode: barcodeModalInput });
+                                            } else {
+                                                // addToast...
+                                            }
+                                        }}
+                                        disabled={!barcodeModalInput}
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-apple text-[10px] font-bold uppercase tracking-wider hover:bg-blue-700 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <Printer className="w-3.5 h-3.5" />
+                                        Тест Печати
+                                    </button>
                                 </div>
 
                                 <div className="bg-white p-6 rounded-apple-lg border-2 border-accent/20 space-y-4">
@@ -3295,7 +3418,7 @@ ${JSON.stringify(context, null, 2)}
                             </div>
                         )}
                     </div>
-                </Modal>
+                </Modal >
                 {/* Edit Product Modal */}
                 < Modal
                     isOpen={isEditModalOpen}
@@ -3355,107 +3478,152 @@ ${JSON.stringify(context, null, 2)}
                                 />
                             </div>
 
+                            {/* Color Selector */}
                             <div>
-                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Фото товара (Галерея)</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {(editForm.images || []).map((url, i) => (
-                                        <div key={i} className="relative w-16 h-16 rounded-apple overflow-hidden border border-light group">
-                                            <img src={url} alt="" className="w-full h-full object-cover" />
-                                            <button
-                                                type="button"
-                                                onClick={() => setEditForm(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
-                                                className="absolute inset-0 bg-dark/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <label className="w-16 h-16 bg-light border-2 border-dashed border-gray/20 rounded-apple flex items-center justify-center cursor-pointer hover:bg-gray/5 transition-all">
-                                        <Plus className="w-5 h-5 text-gray" />
-                                        <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                    </label>
+                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5 leading-none">
+                                    Управление цветом: <span className="text-dark">{selectedBarcodeColor || 'Без цвета'}</span>
+                                </label>
+                                <div className="flex flex-wrap items-center gap-3 mb-4">
+                                    {(() => {
+                                        const displayColors = editForm.colors.length > 0 ? editForm.colors : ['Без цвета'];
+                                        return displayColors.map(c => (
+                                            <div key={c} className="relative group">
+                                                <button
+                                                    key={c}
+                                                    type="button"
+                                                    onClick={() => setSelectedBarcodeColor(c)}
+                                                    className={`flex items-center gap-2 px-3 py-2 rounded-apple border-2 transition-all ${selectedBarcodeColor === c ? 'border-accent bg-accent/5' : 'border-light hover:border-gray/30 bg-white'}`}
+                                                    title={c}
+                                                >
+                                                    <span className="w-4 h-4 rounded-full shadow-sm flex-shrink-0" style={{ backgroundColor: getColorValue(c), border: isLightColor(getColorValue(c)) ? '1px solid #E5E7EB' : 'none' }}></span>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest ${selectedBarcodeColor === c ? 'text-accent' : 'text-gray'}`}>{c}</span>
+                                                    {selectedBarcodeColor === c && <div className="absolute -top-1 -left-1 w-3 h-3 bg-accent text-white rounded-full flex items-center justify-center border border-white"><Check className="w-2 h-2" /></div>}
+                                                </button>
+                                                {editForm.colors.includes(c) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            const newColors = editForm.colors.filter(col => col !== c);
+                                                            setEditForm({ ...editForm, colors: newColors });
+                                                            if (selectedBarcodeColor === c) {
+                                                                setSelectedBarcodeColor(newColors[0] || 'Без цвета');
+                                                            }
+                                                        }}
+                                                        className="absolute -top-2 -right-2 w-5 h-5 bg-white border border-light text-accent rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm hover:bg-light"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ));
+                                    })()}
+
+                                    <div className="flex items-center gap-1.5 ml-2">
+                                        <input
+                                            type="text"
+                                            value={newEditColorInput}
+                                            onChange={(e) => setNewEditColorInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    if (newEditColorInput.trim() && !editForm.colors.includes(newEditColorInput.trim())) {
+                                                        const newColor = newEditColorInput.trim();
+                                                        setEditForm({ ...editForm, colors: [...editForm.colors, newColor] });
+                                                        setSelectedBarcodeColor(newColor);
+                                                        setNewEditColorInput('');
+                                                    }
+                                                }
+                                            }}
+                                            placeholder="Новый цвет..."
+                                            className="w-28 px-2 py-1.5 bg-light border border-transparent rounded-apple text-[10px] font-bold outline-none focus:bg-white focus:border-accent/30 transition-all"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (newEditColorInput.trim() && !editForm.colors.includes(newEditColorInput.trim())) {
+                                                    const newColor = newEditColorInput.trim();
+                                                    setEditForm({ ...editForm, colors: [...editForm.colors, newColor] });
+                                                    setSelectedBarcodeColor(newColor);
+                                                    setNewEditColorInput('');
+                                                }
+                                            }}
+                                            className="p-1.5 bg-accent/10 text-accent rounded-apple hover:bg-accent hover:text-white transition-all"
+                                        >
+                                            <Plus className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white p-6 rounded-apple-lg border-2 border-accent/20 space-y-4">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                                    <label className="block text-xs font-black uppercase tracking-widest text-dark">Размеры и остатки</label>
-                                    <div className="space-y-4">
-                                        <div className="flex flex-wrap items-center gap-3">
-                                            {(() => {
-                                                const displayColors = editForm.colors.length > 0 ? editForm.colors : ['Без цвета'];
-                                                return displayColors.map(c => (
-                                                    <div key={c} className="relative group">
-                                                        <button
-                                                            key={c}
-                                                            type="button"
-                                                            onClick={() => setSelectedBarcodeColor(c)}
-                                                            className={`flex items-center gap-2 px-3 py-2 rounded-apple border-2 transition-all ${selectedBarcodeColor === c ? 'border-accent bg-accent/5' : 'border-light hover:border-gray/30 bg-white'}`}
-                                                            title={c}
-                                                        >
-                                                            <span className="w-4 h-4 rounded-full shadow-sm flex-shrink-0" style={{ backgroundColor: getColorValue(c), border: isLightColor(getColorValue(c)) ? '1px solid #E5E7EB' : 'none' }}></span>
-                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${selectedBarcodeColor === c ? 'text-accent' : 'text-gray'}`}>{c}</span>
-                                                            {selectedBarcodeColor === c && <div className="absolute -top-1 -left-1 w-3 h-3 bg-accent text-white rounded-full flex items-center justify-center border border-white"><Check className="w-2 h-2" /></div>}
-                                                        </button>
-                                                        {editForm.colors.includes(c) && (
+                            {/* Images Section */}
+                            <div>
+                                {(() => {
+                                    const colorKey = selectedBarcodeColor && selectedBarcodeColor !== 'Без цвета' ? selectedBarcodeColor : null;
+                                    const hasSpecificImages = colorKey && editForm.color_images && editForm.color_images[colorKey];
+                                    const displayImages = hasSpecificImages ? editForm.color_images[colorKey] : (editForm.images || []);
+                                    const isInherited = colorKey && !hasSpecificImages && (editForm.images || []).length > 0;
+
+                                    return (
+                                        <>
+                                            <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">
+                                                Фото: <span className={colorKey ? "text-accent" : "text-dark"}>{colorKey ? `Для цвета "${colorKey}"` : 'Общие (для всех)'}</span>
+                                                {isInherited && <span className="ml-2 text-[10px] bg-gray/10 text-gray px-1.5 py-0.5 rounded">Используются общие фото</span>}
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {displayImages.map((url, i) => (
+                                                    <div key={i} className={`relative w-16 h-16 rounded-apple overflow-hidden border group ${isInherited ? 'border-dashed border-gray/40 opacity-70' : 'border-light'}`}>
+                                                        <img src={url} alt="" className="w-full h-full object-cover" />
+                                                        {!isInherited && (
                                                             <button
                                                                 type="button"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    const newColors = editForm.colors.filter(col => col !== c);
-                                                                    setEditForm({ ...editForm, colors: newColors });
-                                                                    if (selectedBarcodeColor === c) {
-                                                                        setSelectedBarcodeColor(newColors[0] || 'Без цвета');
+                                                                onClick={() => {
+                                                                    if (colorKey) {
+                                                                        // Remove from specific color
+                                                                        setEditForm(prev => ({
+                                                                            ...prev,
+                                                                            color_images: {
+                                                                                ...prev.color_images,
+                                                                                [colorKey]: prev.color_images[colorKey].filter((_, idx) => idx !== i)
+                                                                            }
+                                                                        }));
+                                                                    } else {
+                                                                        // Remove from global
+                                                                        setEditForm(prev => ({
+                                                                            ...prev,
+                                                                            images: prev.images.filter((_, idx) => idx !== i)
+                                                                        }));
                                                                     }
                                                                 }}
-                                                                className="absolute -top-2 -right-2 w-5 h-5 bg-white border border-light text-accent rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm hover:bg-light"
+                                                                className="absolute inset-0 bg-dark/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                                                             >
-                                                                <X className="w-3 h-3" />
+                                                                <X className="w-4 h-4" />
                                                             </button>
                                                         )}
                                                     </div>
-                                                ));
-                                            })()}
-
-                                            <div className="flex items-center gap-1.5 ml-2">
-                                                <input
-                                                    type="text"
-                                                    value={newEditColorInput}
-                                                    onChange={(e) => setNewEditColorInput(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            e.preventDefault();
-                                                            if (newEditColorInput.trim() && !editForm.colors.includes(newEditColorInput.trim())) {
-                                                                setEditForm({ ...editForm, colors: [...editForm.colors, newEditColorInput.trim()] });
-                                                                setSelectedBarcodeColor(newEditColorInput.trim());
-                                                                setNewEditColorInput('');
-                                                            }
-                                                        }
-                                                    }}
-                                                    placeholder="Новый цвет..."
-                                                    className="w-28 px-2 py-1.5 bg-light border border-transparent rounded-apple text-[10px] font-bold outline-none focus:bg-white focus:border-accent/30 transition-all"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        if (newEditColorInput.trim() && !editForm.colors.includes(newEditColorInput.trim())) {
-                                                            setEditForm({ ...editForm, colors: [...editForm.colors, newEditColorInput.trim()] });
-                                                            setSelectedBarcodeColor(newEditColorInput.trim());
-                                                            setNewEditColorInput('');
-                                                        }
-                                                    }}
-                                                    className="p-1.5 bg-accent/10 text-accent rounded-apple hover:bg-accent hover:text-white transition-all"
-                                                >
-                                                    <Plus className="w-3.5 h-3.5" />
-                                                </button>
+                                                ))}
+                                                <label className={`w-16 h-16 bg-light border-2 border-dashed border-gray/20 rounded-apple flex items-center justify-center cursor-pointer hover:bg-gray/5 transition-all ${colorKey ? 'border-accent/30 bg-accent/5' : ''}`}>
+                                                    <Plus className={`w-5 h-5 ${colorKey ? 'text-accent' : 'text-gray'}`} />
+                                                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+                                                </label>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+
+                            <div className="bg-white p-6 rounded-apple-lg border-2 border-accent/20 space-y-4">
+                                <label className="block text-xs font-black uppercase tracking-widest text-dark">
+                                    Остатки для: {selectedBarcodeColor || 'Без цвета'}
+                                </label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {['стандарт', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(size => {
                                         const isSelected = editForm.sizes.includes(size);
                                         const colorKey = selectedBarcodeColor || 'Без цвета';
+
+                                        // Filter UI - always show if selected globally
+                                        // But input is for specific color
+
                                         return (
                                             <div key={size} className={`p-3 rounded-apple-lg border-2 transition-all ${isSelected ? 'border-accent/20 bg-accent/5' : 'border-transparent bg-light/50 opacity-60'}`}>
                                                 <div className="flex items-center justify-between mb-2">

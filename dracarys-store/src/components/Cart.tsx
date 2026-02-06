@@ -57,11 +57,22 @@ export const Cart: React.FC = () => {
                                     key={item.id}
                                     className="flex gap-4 p-4 bg-light rounded-lg"
                                 >
-                                    <img
-                                        src={item.image_url}
-                                        alt={item.name}
-                                        className="w-20 h-20 object-cover rounded-lg"
-                                    />
+                                    {(() => {
+                                        const displayImage = (() => {
+                                            if (item.selectedColor && item.color_images?.[item.selectedColor]?.length) {
+                                                return item.color_images[item.selectedColor][0];
+                                            }
+                                            return item.image_url?.split(',')[0];
+                                        })();
+
+                                        return (
+                                            <img
+                                                src={displayImage}
+                                                alt={item.name}
+                                                className="w-20 h-20 object-cover rounded-lg"
+                                            />
+                                        );
+                                    })()}
                                     <div className="flex-1">
                                         <h3 className="font-medium text-dark mb-1">{item.name}</h3>
                                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">

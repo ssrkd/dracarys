@@ -16,6 +16,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoading = f
     const { addItem } = useCartStore();
     const { addToast } = useToastStore();
 
+    const [activeColor, setActiveColor] = React.useState<string | null>(null);
+
     const handleAddToCart = (e: React.MouseEvent) => {
         if (product && product.sizes && product.sizes.length > 0) {
             // Let the Link handle navigation to detail page for size selection
@@ -47,13 +49,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoading = f
 
     const showDiscount = hasDiscount(product.discounted_price);
 
+    // Determine which image to show
+    const displayImage = (() => {
+        if (activeColor && product.color_images?.[activeColor]?.length) {
+            return product.color_images[activeColor][0];
+        }
+        return product.image_url?.split(',')[0];
+    })();
+
     return (
         <Link to={`/products/${product.id}`} className="group block focus:outline-none focus:ring-2 focus:ring-dark/5 focus:ring-offset-2 rounded-apple transition-all duration-300">
             <div className="bg-white rounded-apple overflow-hidden transition-all duration-500 hover:shadow-apple-xl">
                 {/* Image Container */}
                 <div className="relative aspect-square overflow-hidden bg-light">
                     <img
-                        src={product.image_url?.split(',')[0]}
+                        src={displayImage}
                         alt={product.name}
                         className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
                         loading="lazy"
@@ -94,9 +104,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoading = f
                                 .map(c => {
                                     const colorValue = getColorValue(c);
                                     return (
-                                        <div
+                                        <button
                                             key={c}
-                                            className="w-2.5 h-2.5 rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
+                                            type="button" // Prevent link navigation
+                                            onClick={(e) => e.preventDefault()} // Just in case
+                                            onMouseEnter={() => setActiveColor(c)}
+                                            onMouseLeave={() => setActiveColor(null)}
+                                            className="w-2.5 h-2.5 rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] hover:scale-125 transition-transform"
                                             style={{
                                                 backgroundColor: colorValue,
                                                 border: isLightColor(colorValue) ? '1px solid #E5E7EB' : '1px solid rgba(0,0,0,0.1)'

@@ -21,8 +21,39 @@ export const ProductDetail: React.FC = () => {
     const [availability, setAvailability] = useState<AvailabilityMap>({});
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>('');
+    const [activeImage, setActiveImage] = useState<string>('');
     const { addItem } = useCartStore();
     const { addToast } = useToastStore();
+
+    useEffect(() => {
+        if (!product) return;
+
+        let images: string[] = [];
+        // Check for specific color images first
+        if (selectedColor && selectedColor !== 'Без цвета' && product.color_images?.[selectedColor]?.length) {
+            images = product.color_images[selectedColor];
+        } else {
+            // Fallback to global images
+            images = product.image_url ? product.image_url.split(',') : [];
+        }
+
+        // Reset active image if current one is not in the new set, or if we switched sets
+        if (images.length > 0) {
+            // Always set to first image of the set when switching context or if current is invalid
+            // To detect "switching context", we can just see if the current activeImage is in the new list.
+            // But if we switch from Black to White, and both happen to have same URL (unlikely but possible), we might want to reset anyway.
+            // For now, simpler logic: if activeImage is not in new list, OR if we just loaded validation.
+            // Actually, best UX: When color changes, ALWAYS go to first image of that color.
+            // But this effect runs on product load too.
+
+            const isImageInSet = images.includes(activeImage);
+            if (!activeImage || !isImageInSet) {
+                setActiveImage(images[0]);
+            }
+        } else {
+            setActiveImage('');
+        }
+    }, [product, selectedColor, activeImage]);
 
     const loadProduct = async () => {
         if (!id) return;
@@ -106,6 +137,13 @@ export const ProductDetail: React.FC = () => {
 
     if (!product) return null;
 
+    const displayImages = (() => {
+        if (selectedColor && selectedColor !== 'Без цвета' && product.color_images?.[selectedColor]?.length) {
+            return product.color_images[selectedColor];
+        }
+        return product.image_url ? product.image_url.split(',') : [];
+    })();
+
     return (
         <div className="min-h-screen bg-white">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 md:pt-40">
@@ -133,23 +171,19 @@ export const ProductDetail: React.FC = () => {
                     <div className="space-y-6 animate-fade-in">
                         <div className="bg-light rounded-apple-2xl overflow-hidden shadow-soft">
                             <img
-                                src={product.image_url?.split(',')[0]}
+                                src={activeImage || displayImages[0]}
                                 alt={product.name}
-                                id="mainImage"
                                 className="w-full aspect-square object-cover"
                             />
                         </div>
                         {/* Thumbnails */}
-                        {product.image_url && product.image_url.includes(',') && (
+                        {displayImages.length > 1 && (
                             <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
-                                {product.image_url.split(',').map((url, i) => (
+                                {displayImages.map((url, i) => (
                                     <button
                                         key={i}
-                                        onClick={() => {
-                                            const img = document.getElementById('mainImage') as HTMLImageElement;
-                                            if (img) img.src = url;
-                                        }}
-                                        className="w-24 h-24 rounded-apple overflow-hidden border-2 border-transparent hover:border-dark transition-all flex-shrink-0"
+                                        onClick={() => setActiveImage(url)}
+                                        className={`w-24 h-24 rounded-apple overflow-hidden border-2 transition-all flex-shrink-0 ${activeImage === url ? 'border-dark' : 'border-transparent hover:border-dark'}`}
                                     >
                                         <img src={url} alt="" className="w-full h-full object-cover" />
                                     </button>

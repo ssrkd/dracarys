@@ -16,6 +16,7 @@ export interface Product {
     color?: string; // Legacy/Primary color
     colors?: string[]; // Multiple colors support
     hidden_colors?: string[]; // Colors hidden from customers
+    color_images?: Record<string, string[]>; // Photos specific to colors { "ColorName": ["url1", "url2"] }
 }
 
 export interface Purchase {
