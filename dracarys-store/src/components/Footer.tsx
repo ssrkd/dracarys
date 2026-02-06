@@ -22,22 +22,22 @@ export const Footer: React.FC = () => {
                     <div className="col-span-1 md:col-span-2 space-y-6">
                         <Link to="/" className="flex items-center group" aria-label="Dracarys - на главную">
                             <img
-                                src="/photo/dracarys.png"
+                                src="/photo/drcxcrm.png"
                                 alt="Dracarys Logo"
-                                className="h-16 w-auto object-contain transition-transform group-hover:scale-105"
+                                className="h-24 w-auto object-contain transition-transform group-hover:scale-105"
                             />
                         </Link>
                         <p className="text-gray-dark font-black uppercase tracking-widest text-[10px]">
                             Создаем будущее
                         </p>
                         <nav className="flex gap-4" aria-label="Социальные сети">
-                            <a href="https://wa.me/77000000000" className="p-2 bg-white rounded-full shadow-soft hover:shadow-apple transition-all hover:scale-110" aria-label="WhatsApp">
+                            <a href="https://wa.me/77003714100" className="p-2 bg-white rounded-full shadow-soft hover:shadow-apple transition-all hover:scale-110" aria-label="WhatsApp">
                                 <MessageCircle className="w-5 h-5" aria-hidden="true" />
                             </a>
-                            <a href="https://instagram.com/dracarys" className="p-2 bg-white rounded-full shadow-soft hover:shadow-apple transition-all hover:scale-110" aria-label="Instagram">
+                            <a href="https://instagram.com/dracarys.kz" className="p-2 bg-white rounded-full shadow-soft hover:shadow-apple transition-all hover:scale-110" aria-label="Instagram">
                                 <Instagram className="w-5 h-5" aria-hidden="true" />
                             </a>
-                            <a href="https://tiktok.com/@dracarys" className="p-2 bg-white rounded-full shadow-soft hover:shadow-apple transition-all hover:scale-110" aria-label="TikTok">
+                            <a href="https://tiktok.com/@dracarys.kz" className="p-2 bg-white rounded-full shadow-soft hover:shadow-apple transition-all hover:scale-110" aria-label="TikTok">
                                 <Music2 className="w-5 h-5" aria-hidden="true" />
                             </a>
                         </nav>

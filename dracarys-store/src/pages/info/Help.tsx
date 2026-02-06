@@ -1,6 +1,6 @@
 import React from 'react';
 import { SEO } from '../../components/SEO';
-import { Mail, Phone, MessageSquare } from 'lucide-react';
+import { Send, Phone, MessageSquare } from 'lucide-react';
 
 export const Help: React.FC = () => {
     return (
@@ -51,17 +51,17 @@ export const Help: React.FC = () => {
                         <p className="text-gray font-medium">Свяжитесь с нашей командой поддержки напрямую.</p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                            <a href="mailto:support@dracarys.store" className="p-6 bg-white rounded-apple shadow-soft hover:shadow-apple transition-all group">
-                                <Mail className="w-8 h-8 mx-auto mb-4 text-gray group-hover:text-dark transition-colors" />
-                                <span className="block text-sm font-bold text-dark">Email</span>
-                                <span className="block text-xs text-gray mt-1">support@dracarys.store</span>
+                            <a href="https://t.me/ssrkkd" target="_blank" rel="noopener noreferrer" className="p-6 bg-white rounded-apple shadow-soft hover:shadow-apple transition-all group">
+                                <Send className="w-8 h-8 mx-auto mb-4 text-gray group-hover:text-dark transition-colors" />
+                                <span className="block text-sm font-bold text-dark">Telegram</span>
+                                <span className="block text-xs text-gray mt-1">@ssrkkd</span>
                             </a>
-                            <a href="tel:+77777777777" className="p-6 bg-white rounded-apple shadow-soft hover:shadow-apple transition-all group">
+                            <a href="tel:+77003714100" className="p-6 bg-white rounded-apple shadow-soft hover:shadow-apple transition-all group">
                                 <Phone className="w-8 h-8 mx-auto mb-4 text-gray group-hover:text-dark transition-colors" />
                                 <span className="block text-sm font-bold text-dark">Телефон</span>
-                                <span className="block text-xs text-gray mt-1">+7 (777) 777-77-77</span>
+                                <span className="block text-xs text-gray mt-1">+7 (700) 371-41-00</span>
                             </a>
-                            <a href="https://wa.me/77777777777" className="p-6 bg-white rounded-apple shadow-soft hover:shadow-apple transition-all group">
+                            <a href="https://wa.me/77003714100" target="_blank" rel="noopener noreferrer" className="p-6 bg-white rounded-apple shadow-soft hover:shadow-apple transition-all group">
                                 <MessageSquare className="w-8 h-8 mx-auto mb-4 text-gray group-hover:text-dark transition-colors" />
                                 <span className="block text-sm font-bold text-dark">WhatsApp</span>
                                 <span className="block text-xs text-gray mt-1">Написать в чат</span>

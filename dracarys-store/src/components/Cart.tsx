@@ -162,7 +162,7 @@ export const Cart: React.FC = () => {
                                     const effectivePrice = item.discounted_price && item.discounted_price > 0 ? item.discounted_price : item.price;
                                     return `- ${item.name}${barcode}${variantStr} x${item.quantity}: ${effectivePrice * item.quantity} ₸`;
                                 }).join('\n')}\n\n*Итого: ${total.toLocaleString('ru-RU')} ₸*`;
-                                window.open(`https://wa.me/77000000000?text=${encodeURIComponent(message)}`, '_blank');
+                                window.open(`https://wa.me/77003714100?text=${encodeURIComponent(message)}`, '_blank');
                             }}
                         >
                             Оформить заказ в WhatsApp
