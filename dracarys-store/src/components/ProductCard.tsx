@@ -61,11 +61,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoading = f
         <Link to={`/products/${product.id}`} className="group block focus:outline-none focus:ring-2 focus:ring-dark/5 focus:ring-offset-2 rounded-apple transition-all duration-300">
             <div className="bg-white rounded-apple overflow-hidden transition-all duration-500 hover:shadow-apple-xl">
                 {/* Image Container */}
-                <div className="relative aspect-square overflow-hidden bg-light">
+                <div className="relative aspect-square overflow-hidden bg-white">
                     <img
                         src={displayImage}
                         alt={product.name}
-                        className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
+                        className="w-full h-full object-contain transform transition-transform duration-700 ease-out group-hover:scale-110"
                         loading="lazy"
                     />
 

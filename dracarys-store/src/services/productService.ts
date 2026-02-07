@@ -1,9 +1,33 @@
 import { supabase } from '../lib/supabase';
 import type { Product } from '../types/database';
 
+// Simple in-memory cache
+let productCache: Record<string, { data: any, timestamp: number }> = {};
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+const getCached = (key: string) => {
+    const cached = productCache[key];
+    if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+        return cached.data;
+    }
+    return null;
+};
+
+const setCache = (key: string, data: any) => {
+    productCache[key] = { data, timestamp: Date.now() };
+};
+
+const clearCache = () => {
+    productCache = {};
+};
+
 export const productService = {
     // Получить все продукты
     async getAllProducts(): Promise<Product[]> {
+        const cacheKey = 'all_products';
+        const cached = getCached(cacheKey);
+        if (cached) return cached;
+
         if (!supabase) return [];
         const { data, error } = await supabase
             .from('products')
@@ -11,11 +35,16 @@ export const productService = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        setCache(cacheKey, data || []);
         return data || [];
     },
 
     // Получить продукт по ID
     async getProductById(id: string): Promise<Product | null> {
+        const cacheKey = `product_${id}`;
+        const cached = getCached(cacheKey);
+        if (cached) return cached;
+
         if (!supabase) return null;
         const { data, error } = await supabase
             .from('products')
@@ -24,6 +53,7 @@ export const productService = {
             .single();
 
         if (error) throw error;
+        setCache(cacheKey, data);
         return data;
     },
 
@@ -33,6 +63,10 @@ export const productService = {
             return this.getAllProducts();
         }
 
+        const cacheKey = `category_${category}`;
+        const cached = getCached(cacheKey);
+        if (cached) return cached;
+
         const { data, error } = await supabase
             .from('products')
             .select('*')
@@ -40,11 +74,16 @@ export const productService = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        setCache(cacheKey, data || []);
         return data || [];
     },
 
     // Получить только избранные продукты
     async getFeaturedProducts(): Promise<Product[]> {
+        const cacheKey = 'featured_products';
+        const cached = getCached(cacheKey);
+        if (cached) return cached;
+
         if (!supabase) return [];
         const { data, error } = await supabase
             .from('products')
@@ -53,6 +92,7 @@ export const productService = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        setCache(cacheKey, data || []);
         return data || [];
     },
 
@@ -103,6 +143,7 @@ export const productService = {
             .single();
 
         if (error) throw error;
+        clearCache();
         return data as Product;
     },
 
@@ -123,6 +164,7 @@ export const productService = {
             .single();
 
         if (error) throw error;
+        clearCache();
         return data as Product;
     },
 
@@ -134,6 +176,7 @@ export const productService = {
             .eq('id', id);
 
         if (error) throw error;
+        clearCache();
     },
 
     // Toggle product visibility
@@ -165,6 +208,10 @@ export const productService = {
 
     // Get only visible products (for customer view)
     async getVisibleProducts(): Promise<Product[]> {
+        const cacheKey = 'visible_products';
+        const cached = getCached(cacheKey);
+        if (cached) return cached;
+
         if (!supabase) return [];
         const { data, error } = await supabase
             .from('products')
@@ -173,6 +220,7 @@ export const productService = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
+        setCache(cacheKey, data || []);
         return data || [];
     },
 
@@ -229,6 +277,7 @@ export const productService = {
                 },
                 (payload: any) => {
                     console.log('Realtime change detected:', payload.eventType, payload.new);
+                    clearCache(); // IMPORTANT: Clear cache on real-time updates too
                     callback();
                 }
             )

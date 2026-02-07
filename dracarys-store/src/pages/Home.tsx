@@ -198,15 +198,17 @@ export const Home: React.FC = () => {
                     </div>
 
                     {isLoading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-8 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x">
                             {[1, 2, 3, 4].map((i) => (
-                                <Skeleton key={i} className="aspect-[3/4] rounded-apple-lg" />
+                                <Skeleton key={i} className="min-w-[280px] md:min-w-0 aspect-[3/4] rounded-apple-lg snap-start" />
                             ))}
                         </div>
                     ) : featuredProducts.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                        <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-8 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x no-scrollbar">
                             {featuredProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                <div key={product.id} className="min-w-[280px] md:min-w-0 snap-start">
+                                    <ProductCard product={product} />
+                                </div>
                             ))}
                         </div>
                     ) : (
