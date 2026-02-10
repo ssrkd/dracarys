@@ -8,7 +8,7 @@ export const Footer: React.FC = () => {
 
     const links = isAdmin ? [
         { title: 'Товары', path: '/dracarys-admin?tab=products' },
-        { title: 'drc ai', path: '/dracarys-admin?tab=ai' },
+        { title: 'Управление', path: '/dracarys-admin?tab=ai' },
     ] : [
         { title: 'Главная', path: '/' },
         { title: 'Каталог', path: '/products' },

@@ -488,7 +488,7 @@ export const AdminAI: React.FC = () => {
                     photo_url: newPurchase.photo_url || undefined,
                     order_date: newPurchase.order_date,
                     item_url: newPurchase.item_url || undefined,
-                    cargo: newPurchase.cargo
+                    cargo: newPurchase.cargo as 'GO-express' | 'SHAO-cargo'
                 })
             ));
 
