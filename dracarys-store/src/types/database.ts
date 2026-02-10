@@ -29,6 +29,7 @@ export interface Purchase {
     category: string;
     photo_url?: string;
     color?: string;
+    cargo?: 'GO-express' | 'SHAO-cargo';
     status: 'pending' | 'arrived' | 'listed' | 'archived';
     delivery_cost?: number;
     total_cost?: number; // purchase_price + delivery_cost

@@ -28,7 +28,6 @@ export const Header: React.FC = () => {
     const navLinks = isAdmin ? [
         { title: 'Товары', path: '/dracarys-admin?tab=products' },
         { title: 'drc ai', path: '/dracarys-admin?tab=ai' },
-        { title: 'FoCal', path: '/dracarys-admin?tab=focal' },
     ] : [
         { title: 'Главная', path: '/' },
         { title: 'Товары', path: '/products' },

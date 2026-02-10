@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Edit, Trash2, Search, Package, Upload, Check, Loader2, Star, Eye, EyeOff, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Package, Upload, Check, Loader2, Star, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
@@ -12,7 +12,6 @@ import type { Product, Category } from '../types/database';
 import { SEO } from '../components/SEO';
 import { capitalizeCategory, formatPrice, hasDiscount } from '../utils/formatters';
 import { AdminAI } from './AdminAI';
-import { AdminFocal } from './AdminFocal';
 
 interface ProductFormData {
     name: string;
@@ -53,18 +52,18 @@ export const Admin: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState<'products' | 'ai' | 'focal'>((searchParams.get('tab') as 'products' | 'ai' | 'focal') || 'products');
+    const [activeTab, setActiveTab] = useState<'products' | 'ai'>((searchParams.get('tab') as 'products' | 'ai') || 'products');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Sync tab from URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab === 'products' || tab === 'ai' || tab === 'focal') {
+        if (tab === 'products' || tab === 'ai') {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
-    const handleTabChange = (tab: 'products' | 'ai' | 'focal') => {
+    const handleTabChange = (tab: 'products' | 'ai') => {
         setSearchParams({ tab });
         setActiveTab(tab);
     };
@@ -299,7 +298,7 @@ export const Admin: React.FC = () => {
                     <div className="space-y-4 mt-12 md:mt-0">
                         <h3 className="text-xs uppercase tracking-[0.4em] font-bold text-gray">Management Cloud</h3>
                         <h1 className="text-5xl font-bold text-dark tracking-tighter">
-                            {activeTab === 'products' ? 'Admin Panel' : activeTab === 'ai' ? 'dracarys AI' : 'FoCal Dashboard'}
+                            {activeTab === 'products' ? 'Admin Panel' : 'Management'}
                         </h1>
                         <div className="flex items-center gap-4 mt-4">
                             <button
@@ -315,15 +314,7 @@ export const Admin: React.FC = () => {
                                     }`}
                             >
                                 <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />
-                                drc ai
-                            </button>
-                            <button
-                                onClick={() => handleTabChange('focal')}
-                                className={`text-[10px] uppercase tracking-widest font-black px-4 py-2 rounded-full transition-all flex items-center gap-2 ${activeTab === 'focal' ? 'bg-dark text-white shadow-apple' : 'text-gray hover:bg-light'
-                                    }`}
-                            >
-                                <CalendarIcon className="w-3.5 h-3.5" />
-                                FoCal
+                                Управление
                             </button>
                         </div>
                     </div>
@@ -471,10 +462,8 @@ export const Admin: React.FC = () => {
                         </div>
 
                     </>
-                ) : activeTab === 'ai' ? (
-                    <AdminAI />
                 ) : (
-                    <AdminFocal />
+                    <AdminAI />
                 )}
 
                 {/* Product Form Modal */}

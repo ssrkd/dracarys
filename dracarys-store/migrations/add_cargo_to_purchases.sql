@@ -1,0 +1,1 @@
+ALTER TABLE purchases ADD COLUMN IF NOT EXISTS cargo text;

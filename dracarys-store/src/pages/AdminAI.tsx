@@ -278,6 +278,7 @@ export const AdminAI: React.FC = () => {
         purchase_price: '',
         yuan_price: '',
         source_app: 1,
+        cargo: 'GO-express',
         category: '',
         photo_url: '',
         color: '',
@@ -486,7 +487,8 @@ export const AdminAI: React.FC = () => {
                     category: newPurchase.category,
                     photo_url: newPurchase.photo_url || undefined,
                     order_date: newPurchase.order_date,
-                    item_url: newPurchase.item_url || undefined
+                    item_url: newPurchase.item_url || undefined,
+                    cargo: newPurchase.cargo
                 })
             ));
 
@@ -496,6 +498,7 @@ export const AdminAI: React.FC = () => {
                 purchase_price: '',
                 yuan_price: '',
                 source_app: 1,
+                cargo: 'GO-express',
                 category: '',
                 photo_url: '',
                 color: '',
@@ -1775,7 +1778,7 @@ ${JSON.stringify(context, null, 2)}
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-dark">
                     {/* Input Form */}
-                    <div className="lg:col-span-9 space-y-8">
+                    <div className="lg:col-span-12 space-y-8">
                         <div className="bg-white p-5 md:p-10 rounded-apple-xl shadow-apple-lg border border-light">
                             {/* Toggle Switches */}
                             <div className="flex bg-light p-1 rounded-apple mb-8 w-fit mx-auto md:mx-0 flex-wrap justify-center md:justify-start">
@@ -2085,6 +2088,17 @@ ${JSON.stringify(context, null, 2)}
                                                 </select>
                                             </div>
                                             <div>
+                                                <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Карго</label>
+                                                <select
+                                                    value={newPurchase.cargo || 'GO-express'}
+                                                    onChange={(e) => setNewPurchase({ ...newPurchase, cargo: e.target.value })}
+                                                    className="w-full px-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark focus:bg-white focus:border-dark transition-all font-bold text-sm outline-none"
+                                                >
+                                                    <option value="GO-express">GO-express</option>
+                                                    <option value="SHAO-cargo">SHAO-cargo</option>
+                                                </select>
+                                            </div>
+                                            <div>
                                                 <label className="block text-xs font-black uppercase tracking-widest text-gray mb-1.5">Категория</label>
                                                 <select
                                                     value={newPurchase.category}
@@ -2364,6 +2378,7 @@ ${JSON.stringify(context, null, 2)}
                                                                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray text-right">Даты</th>
                                                                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray text-center">Транзит</th>
                                                                         <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray text-right">Источник</th>
+                                                                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray text-right">Карго</th>
                                                                         <th className="px-6 py-4"></th>
                                                                     </tr>
                                                                 </thead>
@@ -2439,6 +2454,11 @@ ${JSON.stringify(context, null, 2)}
                                                                                     </span>
                                                                                 </td>
                                                                                 <td className="px-6 py-6 text-right">
+                                                                                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+                                                                                        {p.cargo || '—'}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td className="px-6 py-6 text-right">
                                                                                     <button
                                                                                         onClick={() => confirmDeletePurchase(p)}
                                                                                         className="p-2 text-gray hover:text-danger opacity-0 group-hover:opacity-100 transition-all"
@@ -2511,10 +2531,15 @@ ${JSON.stringify(context, null, 2)}
                                                                         </div>
 
                                                                         <div className="pt-3 border-t border-light/50 flex justify-between items-center">
-                                                                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${p.source_app === 1 ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
-                                                                                }`}>
-                                                                                Приложение {p.source_app}
-                                                                            </span>
+                                                                            <div className="flex flex-col items-start gap-1">
+                                                                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${p.source_app === 1 ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                                                                                    }`}>
+                                                                                    Приложение {p.source_app}
+                                                                                </span>
+                                                                                <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+                                                                                    {p.cargo || '—'}
+                                                                                </span>
+                                                                            </div>
                                                                             {p.item_url && (
                                                                                 <a
                                                                                     href={p.item_url}
@@ -2611,6 +2636,7 @@ ${JSON.stringify(context, null, 2)}
                                                                     <div className="flex items-center gap-1.5 font-black text-[9px] uppercase">
                                                                         <span className="text-gray">× {purchase.quantity}</span>
                                                                         <span className="text-gray-light bg-light px-1 rounded">Прил {purchase.source_app}</span>
+                                                                        <span className="text-gray-light bg-light px-1 rounded">{purchase.cargo || '—'}</span>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -2756,60 +2782,7 @@ ${JSON.stringify(context, null, 2)}
                             </div>
                         </div>
 
-                        {/* AI Assistant Sidebar */}
-                        <div className="lg:col-span-3 space-y-8 order-first lg:order-last">
-                            <div className="glass p-5 md:p-8 rounded-apple-xl border-white/50 sticky top-32">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-10 h-10 bg-dark text-white rounded-apple flex items-center justify-center">
-                                        <Brain className="w-6 h-6 animate-pulse" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-dark leading-none">drcAI</h3>
-                                        <p className="text-[10px] font-black text-gray uppercase tracking-widest">Business Intelligence</p>
-                                    </div>
-                                </div>
 
-                                <div className="space-y-6">
-                                    <div className="bg-white/80 p-5 md:p-6 rounded-apple border border-white/50 shadow-soft min-h-[150px] md:min-h-[200px] flex flex-col justify-between">
-                                        {isAiLoading ? (
-                                            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-                                                <div className="w-8 h-8 border-2 border-dark border-t-transparent rounded-full animate-spin" />
-                                                <p className="text-[10px] font-black text-gray uppercase tracking-widest">Анализирую данные...</p>
-                                            </div>
-                                        ) : (
-                                            <div className="flex-1">
-                                                {aiResponse ? (
-                                                    <p className="text-sm font-medium text-dark leading-relaxed whitespace-pre-wrap">
-                                                        {aiResponse}
-                                                    </p>
-                                                ) : (
-                                                    <p className="text-sm text-gray font-medium italic">
-                                                        Нажмите кнопку ниже, чтобы получить полный отчет по итогам всех продаж.
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <button
-                                        onClick={askAi}
-                                        disabled={isAiLoading || sales.length === 0}
-                                        className="w-full h-14 bg-dark text-white rounded-apple font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-apple-lg border border-white/10"
-                                    >
-                                        <Brain className="w-5 h-5" />
-                                        Общий чек
-                                    </button>
-                                </div>
-
-                                <div className="mt-8 pt-8 border-t border-white/20">
-                                    <h4 className="text-[10px] font-black text-gray uppercase tracking-[0.2em] mb-4">Статус помощника</h4>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 bg-success rounded-full animate-ping" />
-                                        <span className="text-xs font-bold text-dark">В сети • Готов к анализу</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div >
                     </div >
                 </div >
 
