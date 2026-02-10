@@ -14,7 +14,6 @@ import { useToastStore } from '../store/toastStore';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 
-const GEMINI_API_KEY = "AIzaSyBf7rzr9CED8FGhUTeAVWjQ0JgPbXz6SDs";
 
 const CATEGORIES = [
     "Штаны",
