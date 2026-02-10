@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ShoppingCart, TrendingUp, Plus, Trash2, LayoutDashboard, Brain, Check, Package, X, Download, Loader2, Search, Printer, Pencil, Calendar, Clock, Send, Copy, FileText, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
+import { ShoppingCart, TrendingUp, Plus, Trash2, LayoutDashboard, Check, Package, X, Download, Loader2, Search, Printer, Pencil, Calendar, Clock, Send, Copy, FileText, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -72,9 +72,7 @@ export const AdminAI: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [purchases, setPurchases] = useState<Purchase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isAiLoading, setIsAiLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [aiResponse, setAiResponse] = useState<string | null>(null);
     const { addToast } = useToastStore();
 
     // UI State
@@ -1527,105 +1525,7 @@ export const AdminAI: React.FC = () => {
         return grouped;
     }, [warehouseInventory]);
 
-    const askAi = async () => {
-        setIsAiLoading(true);
-        setAiResponse(null);
-        try {
-            const activePurchases = purchases.filter(p => p.status === 'pending' || p.status === 'arrived');
-            const context = {
-                stats: {
-                    totalRevenue: stats.totalRevenue,
-                    totalProfit: stats.totalProfit,
-                    count: stats.count,
-                    activePurchasesCount: activePurchases.length,
-                    totalPurchaseValue: activePurchases.reduce((sum, p) => sum + (p.total_cost || p.purchase_price) * p.quantity, 0)
-                },
-                salesData: sales.map(s => ({
-                    product: s.product_name,
-                    size: s.size,
-                    quantity: s.quantity,
-                    purchase: s.purchase_price || 0,
-                    selling: s.selling_price,
-                    profit: (s.selling_price - (s.purchase_price || 0)) * s.quantity
-                })),
-                activePurchases: activePurchases.map(p => ({
-                    name: p.name,
-                    category: p.category,
-                    cost: p.total_cost || p.purchase_price,
-                    quantity: p.quantity,
-                    status: p.status
-                }))
-            };
 
-            const prompt = `Ты — совладелец и финансовый советник магазина Dracarys. Твое имя — drcAI.
-
-ЯЗЫК:
-- Только русский.
-
-СТРОГИЕ ПРАВИЛА ФОРМАТА:
-- Только простой текст.
-- Каждая строка ДОЛЖНА быть на новой строке.
-- Обязательные разрывы строк. НИКАК не объединяй строки.
-- НИКАК не ставь несколько разделов на одной строке.
-- НИКАК не добавляй подпись, приветствие или свое имя в конце.
-
-ЗАПРЕЩЕНО:
-- Никакого markdown (никаких **, #, - и т.д.).
-- Никаких эмодзи.
-- Никаких подписей («drcAI», «Ваш советник» и т.д.).
-- НЕ повторяй цифры, которые УЖЕ видны в UI.
-- НЕ выдумывай и не предполагай ничего.
-
-РОЛЬ И ТОН:
-- Действуй как совладелец. Прямой, строгий, аналитический тон.
-- Учитывай как продажи, так и текущие закупки в контексте. Принимай решения по замороженным на закупках деньгам.
-- Никакой мотивации, поощрения или мягких выражений.
-
-ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ОТВЕТА:
-
-Оборот: X ₸
-Прибыль: Y ₸
-Количество продаж: Z
-
-Совет от drcAI:
-[Параграф 1: Анализ (2 предложения)]
-[Параграф 2: Действие (2 предложения)]
-
-ДАННЫЕ:
-${JSON.stringify(context, null, 2)}
-
-ФИНАЛЬНОЕ ПРАВИЛО: НИКАКОГО MARKDOWN. НИКАКИХ ПОДПИСЕЙ. Только чистый текст.`;
-
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('AI API Error:', errorData);
-                if (response.status === 429) {
-                    throw new Error("Лимит запросов API исчерпан. Пожалуйста, подождите или обновите тариф.");
-                }
-                throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
-            }
-
-            const data = await response.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!text) {
-                setAiResponse("Нет данных для анализа. Добавьте продажи.");
-            } else {
-                setAiResponse(text);
-            }
-        } catch (error: any) {
-            setAiResponse(`Ошибка drcAI: ${error.message || 'Неизвестная ошибка'}`);
-        } finally {
-            setIsAiLoading(false);
-        }
-    };
 
     const handleExportToExcel = async () => {
         if (sales.length === 0) {
