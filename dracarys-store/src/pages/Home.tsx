@@ -200,7 +200,7 @@ export const Home: React.FC = () => {
                     {isLoading ? (
                         <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-8 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x">
                             {[1, 2, 3, 4].map((i) => (
-                                <Skeleton key={i} className="min-w-[280px] md:min-w-0 aspect-[3/4] rounded-apple-lg snap-start" />
+                                <Skeleton key={i} className="min-w-[280px] md:min-w-0 aspect-[9/16] rounded-apple-lg snap-start" />
                             ))}
                         </div>
                     ) : featuredProducts.length > 0 ? (

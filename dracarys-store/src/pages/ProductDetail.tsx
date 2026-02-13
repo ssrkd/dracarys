@@ -173,7 +173,7 @@ export const ProductDetail: React.FC = () => {
                             <img
                                 src={activeImage || displayImages[0]}
                                 alt={product.name}
-                                className="w-full aspect-square object-cover"
+                                className="w-full aspect-[9/16] object-cover"
                             />
                         </div>
                         {/* Thumbnails */}

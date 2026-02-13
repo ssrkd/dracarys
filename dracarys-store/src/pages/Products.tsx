@@ -164,7 +164,7 @@ export const Products: React.FC = () => {
                                 <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-12 animate-fade-in">
                                     {Array.from({ length: 9 }).map((_, i) => (
                                         <div key={i} className="space-y-4">
-                                            <Skeleton className="aspect-square rounded-apple" />
+                                            <Skeleton className="aspect-[9/16] rounded-apple" />
                                             <Skeleton className="h-6 w-3/4" />
                                             <Skeleton className="h-4 w-1/2" />
                                         </div>
