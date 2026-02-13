@@ -38,6 +38,8 @@ export interface Purchase {
     arrival_date?: string; // When the order arrived
     item_url?: string; // Link to the product source
     created_at: string;
+    for_whom?: 'business' | 'myself' | 'home'; // For whom the purchase is
+    track_code?: string; // Track code for the purchase
 }
 
 export interface Sale {
