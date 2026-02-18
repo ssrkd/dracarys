@@ -52,18 +52,18 @@ export const Admin: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState<'products' | 'ai'>((searchParams.get('tab') as 'products' | 'ai') || 'products');
+    const [activeTab, setActiveTab] = useState<'products' | 'ai' | 'archive'>((searchParams.get('tab') as 'products' | 'ai' | 'archive') || 'products');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Sync tab from URL
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab === 'products' || tab === 'ai') {
+        if (tab === 'products' || tab === 'ai' || tab === 'archive') {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
-    const handleTabChange = (tab: 'products' | 'ai') => {
+    const handleTabChange = (tab: 'products' | 'ai' | 'archive') => {
         setSearchParams({ tab });
         setActiveTab(tab);
     };
@@ -298,7 +298,7 @@ export const Admin: React.FC = () => {
                     <div className="space-y-4 mt-12 md:mt-0">
                         <h3 className="text-xs uppercase tracking-[0.4em] font-bold text-gray">Management Cloud</h3>
                         <h1 className="text-5xl font-bold text-dark tracking-tighter">
-                            {activeTab === 'products' ? 'Admin Panel' : 'Management'}
+                            {activeTab === 'products' ? 'Admin Panel' : activeTab === 'archive' ? 'Архив' : 'Management'}
                         </h1>
                         <div className="flex items-center gap-4 mt-4">
                             <button
@@ -315,6 +315,13 @@ export const Admin: React.FC = () => {
                             >
                                 <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />
                                 Управление
+                            </button>
+                            <button
+                                onClick={() => handleTabChange('archive')}
+                                className={`text-[10px] uppercase tracking-widest font-black px-4 py-2 rounded-full transition-all ${activeTab === 'archive' ? 'bg-dark text-white' : 'text-gray hover:bg-light'
+                                    }`}
+                            >
+                                Архив
                             </button>
                         </div>
                     </div>
@@ -462,6 +469,8 @@ export const Admin: React.FC = () => {
                         </div>
 
                     </>
+                ) : activeTab === 'archive' ? (
+                    <AdminAI initialMode="archive" />
                 ) : (
                     <AdminAI />
                 )}

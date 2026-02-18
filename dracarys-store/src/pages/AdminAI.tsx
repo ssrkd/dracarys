@@ -66,7 +66,11 @@ const compressImage = async (file: File): Promise<Blob> => {
     });
 };
 
-export const AdminAI: React.FC = () => {
+interface AdminAIProps {
+    initialMode?: 'sale' | 'purchase' | 'warehouse' | 'archive';
+}
+
+export const AdminAI: React.FC<AdminAIProps> = ({ initialMode }) => {
     const [sales, setSales] = useState<Sale[]>([]);
     const [products, setProducts] = useState<Product[]>([]);
     const [purchases, setPurchases] = useState<Purchase[]>([]);
@@ -75,8 +79,9 @@ export const AdminAI: React.FC = () => {
     const { addToast } = useToastStore();
 
     // UI State
-    const [inputMode, setInputMode] = useState<'sale' | 'purchase' | 'warehouse' | 'archive'>('sale');
+    const [inputMode, setInputMode] = useState<'sale' | 'purchase' | 'warehouse' | 'archive'>(initialMode || 'sale');
     const [searchQuery, setSearchQuery] = useState('');
+    const [archiveSearch, setArchiveSearch] = useState('');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedSaleForReceipt, setSelectedSaleForReceipt] = useState<Sale | null>(null);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
@@ -1714,15 +1719,7 @@ export const AdminAI: React.FC = () => {
                                         Склад
                                     </div>
                                 </button>
-                                <button
-                                    onClick={() => setInputMode('archive')}
-                                    className={`px-6 py-2.5 rounded-apple text-xs font-black uppercase tracking-widest transition-all ${inputMode === 'archive' ? 'bg-white text-dark shadow-soft' : 'text-gray hover:text-dark'}`}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <Package className="w-4 h-4" />
-                                        Архив
-                                    </div>
-                                </button>
+
                             </div>
 
                             {inputMode === 'sale' ? (
@@ -2141,7 +2138,6 @@ export const AdminAI: React.FC = () => {
                                                 .sort((a, b) => b[1].totalQty - a[1].totalQty)
                                                 .map(([name, data]) => {
                                                     const product = products.find(p => p.name.trim() === name.trim());
-                                                    const price = product ? product.selling_price : 0;
                                                     return (
                                                         <div key={name} className="animate-scale-in">
                                                             <div className="bg-white rounded-apple-2xl overflow-hidden border border-light shadow-apple-sm hover:shadow-apple-lg transition-all duration-500 group flex flex-col h-full">
@@ -2291,8 +2287,19 @@ export const AdminAI: React.FC = () => {
                                 </div>
                             ) : inputMode === 'archive' ? (
                                 <div className="space-y-6 pt-4 md:pt-0">
+                                    {/* Archive Search Bar */}
+                                    <div className="relative group">
+                                        <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray transition-colors group-focus-within:text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+                                        <input
+                                            type="text"
+                                            placeholder="Поиск по архиву..."
+                                            value={archiveSearch}
+                                            onChange={(e) => setArchiveSearch(e.target.value)}
+                                            className="w-full pl-11 pr-4 py-3 bg-light border-2 border-transparent rounded-apple text-dark placeholder-gray/50 focus:outline-none focus:bg-white focus:border-dark/10 transition-all text-sm font-medium"
+                                        />
+                                    </div>
                                     <div className="space-y-4">
-                                        {purchases.filter(p => p.status === 'arrived').length > 0 ? (
+                                        {purchases.filter(p => p.status === 'arrived' && (!archiveSearch || p.name.toLowerCase().includes(archiveSearch.toLowerCase()))).length > 0 ? (
                                             <>
                                                 {/* Desktop Table View */}
                                                 <div className="hidden md:block overflow-x-auto border border-light rounded-apple-2xl">
@@ -2311,7 +2318,7 @@ export const AdminAI: React.FC = () => {
                                                             </tr>
                                                         </thead>
                                                         <tbody className="bg-white divide-y divide-light">
-                                                            {purchases.filter(p => p.status === 'arrived').map(p => {
+                                                            {purchases.filter(p => p.status === 'arrived' && (!archiveSearch || p.name.toLowerCase().includes(archiveSearch.toLowerCase()))).map(p => {
                                                                 const orderDate = p.order_date ? new Date(p.order_date) : null;
                                                                 const arrivalDate = p.arrival_date ? new Date(p.arrival_date) : (p.status === 'arrived' ? new Date(p.created_at) : null);
                                                                 const transitDays = orderDate && arrivalDate
@@ -2421,7 +2428,7 @@ export const AdminAI: React.FC = () => {
 
                                                 {/* Mobile Card View */}
                                                 <div className="md:hidden space-y-4">
-                                                    {purchases.filter(p => p.status === 'arrived').map(p => {
+                                                    {purchases.filter(p => p.status === 'arrived' && (!archiveSearch || p.name.toLowerCase().includes(archiveSearch.toLowerCase()))).map(p => {
                                                         const orderDate = p.order_date ? new Date(p.order_date) : null;
                                                         const arrivalDate = p.arrival_date ? new Date(p.arrival_date) : (p.status === 'arrived' ? new Date(p.created_at) : null);
                                                         const transitDays = orderDate && arrivalDate
